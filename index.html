@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>لَكِ - تطبيق الأمومة</title>
+    <!-- PWA Meta -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,{&quot;name&quot;:&quot;لَكِ - تطبيق الأمومة&quot;,&quot;short_name&quot;:&quot;لَكِ&quot;,&quot;description&quot;:&quot;رفيقة المرأة في رحلة الأمومة&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#D37586&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;logo.png&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},{&quot;src&quot;:&quot;logo.png&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}]}" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* ===== RESET & FULLSCREEN ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            background: #ffffff;
+            direction: rtl;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== SCREENS (fullscreen) ===== */
+        .screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #ffffff;
+            z-index: 1;
+        }
+        .screen.active {
+            display: flex;
+            z-index: 2;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== SPLASH (خلفية 1.png - فقط زر متوهج ومنزل للأسفل) ===== */
+        #splash {
+            justify-content: flex-start;
+            /* محاذاة للأعلى لنزول الزر للأسفل */
+            align-items: center;
+            text-align: center;
+            background-image: url('1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #FDE2D3;
+            position: relative;
+            padding-top: 20vh;
+            /* دفع المحتوى للأسفل قليلاً */
+        }
+        #splash>* {
+            position: relative;
+            z-index: 2;
+        }
+        #splash .spacer {
+            flex: 1;
+            /* دفع الزر للأسفل أكثر */
+        }
+        .btn-splash {
+            background: #D37586;
+            color: #fff;
+            border: none;
+            padding: 18px 64px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(2px);
+            background: rgba(211, 117, 134, 0.95);
+            margin-top: 60px;
+            /* نزول إضافي للزر */
+            margin-bottom: 40px;
+            /* هامش سفلي لتوسيط بصري */
+            animation: glow-pulse 2.5s infinite ease-in-out;
+            transition: transform 0.15s;
+            will-change: transform, box-shadow;
+        }
+        .btn-splash:active {
+            transform: scale(0.94);
+        }
+
+        @keyframes glow-pulse {
+            0% {
+                box-shadow: 0 0 15px rgba(211, 117, 134, 0.4), 0 0 30px rgba(211, 117, 134, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(211, 117, 134, 0.9), 0 0 60px rgba(211, 117, 134, 0.5), 0 0 100px rgba(211, 117, 134, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(211, 117, 134, 0.4), 0 0 30px rgba(211, 117, 134, 0.2);
+            }
+        }
+
+        /* ===== LOGIN ===== */
+        #login {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #FDE2D3 0%, #F5E1E4 100%);
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 30px 20px 28px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 12px 40px rgba(211, 117, 134, 0.15);
+            text-align: center;
+        }
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 12px;
+            border-radius: 20px;
+            background: #fff;
+            padding: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .login-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-top: 4px;
+        }
+        .login-desc {
+            color: #8FA89B;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #F5E1E4;
+            border-radius: 12px;
+            font-family: 'Cairo';
+            margin-bottom: 14px;
+            outline: none;
+            transition: border 0.2s;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+        .form-input:focus {
+            border-color: #D37586;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #D37586;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+        }
+        .btn-login:active {
+            transform: scale(0.96);
+        }
+        .signup-link {
+            text-align: center;
+            color: #8FA89B;
+            font-size: 0.8rem;
+            margin-top: 14px;
+        }
+        .signup-link a {
+            color: #D37586;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ===== SIGNUP (شاشة إنشاء حساب جديدة) ===== */
+        #signup {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #FDE2D3 0%, #F5E1E4 100%);
+        }
+
+        /* ===== HEADER (ثابت) ===== */
+        .detail-header,
+        .header-home {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(135deg, #F5E1E4 0%, #FDE2D3 100%);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 2px 12px rgba(211, 117, 134, 0.08);
+            min-height: 64px;
+        }
+        .header-home .header-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+        .header-home .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .header-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .header-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        .header-subtext {
+            font-size: 0.75rem;
+            color: #8FA89B;
+        }
+        .back-btn {
+            font-size: 1.3rem;
+            color: #D37586;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: transform 0.15s, background 0.2s;
+            will-change: transform;
+            flex-shrink: 0;
+        }
+        .back-btn:active {
+            transform: scale(0.85);
+        }
+        .detail-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* في شاشة الفيديو header شفاف */
+        #videocall .detail-header {
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            border-radius: 0;
+            box-shadow: none;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+        }
+        #videocall .detail-title {
+            color: #fff;
+        }
+        #videocall .back-btn {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== CONTENT ===== */
+        .detail-content {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px 16px 20px;
+            background: #FFFDFB;
+            min-height: 0;
+        }
+        .detail-content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .detail-content::-webkit-scrollbar-thumb {
+            background: #D37586;
+            border-radius: 10px;
+        }
+
+        /* ===== HOME GRID ===== */
+        #home {
+            background: #FFFDFB;
+        }
+        #home .header-home {
+            border-radius: 0 0 20px 20px;
+        }
+        .grid-cards {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px 16px 20px;
+            align-content: start;
+            overflow-y: auto;
+        }
+        .card-home {
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.12s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            font-family: 'Cairo';
+            gap: 6px;
+            will-change: transform;
+        }
+        .card-home i {
+            font-size: 2.2rem;
+        }
+        .card-home:active {
+            transform: scale(0.94);
+        }
+        .card-1 {
+            background: linear-gradient(135deg, #F5E1E4 0%, #FDE0DC 100%);
+            color: #D37586;
+        }
+        .card-2 {
+            background: linear-gradient(135deg, #E3EBE6 0%, #D5E3D8 100%);
+            color: #7A9B8A;
+        }
+        .card-3 {
+            background: linear-gradient(135deg, #FDE2D3 0%, #FDD5C0 100%);
+            color: #D37586;
+        }
+        .card-4 {
+            background: linear-gradient(135deg, #F0E6F6 0%, #E8D9EF 100%);
+            color: #A67FB5;
+        }
+        .card-5 {
+            background: linear-gradient(135deg, #E0F0EA 0%, #D2E8E0 100%);
+            color: #6A9B85;
+        }
+        .card-6 {
+            background: linear-gradient(135deg, #FDE0DD 0%, #FDD3CF 100%);
+            color: #D37586;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin: 8px 0;
+            border: 1px solid #F5E1E4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        .card-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .card-title i {
+            color: #D37586;
+            width: 1.4rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .card-text {
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* ===== PREGNANCY TRACKER ===== */
+        .progress-ring {
+            width: 100px;
+            height: 100px;
+            margin: 6px auto 8px;
+            border-radius: 50%;
+            background: conic-gradient(#D37586 60%, #F5E1E4 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .progress-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .week-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #D37586;
+            line-height: 1;
+        }
+        .week-text {
+            font-size: 0.7rem;
+            color: #8FA89B;
+        }
+        .pregnancy-progress-bar {
+            background: #F5E1E4;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .pregnancy-progress-bar div {
+            width: 60%;
+            height: 100%;
+            background: #D37586;
+            border-radius: 8px;
+        }
+
+        /* ===== APPOINTMENTS ===== */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 6px 0 4px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid #F5E1E4;
+            transition: border 0.2s, background 0.2s;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #333;
+            gap: 8px;
+        }
+        .radio-item:has(input:checked) {
+            border-color: #D37586;
+            background: #FDF2F4;
+        }
+        .radio-item input {
+            accent-color: #D37586;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin: 6px 0 4px;
+        }
+        .date-btn {
+            padding: 6px 0;
+            background: #F5E1E4;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+            font-family: 'Cairo';
+            font-size: 0.8rem;
+            will-change: transform;
+        }
+        .date-btn:active {
+            transform: scale(0.9);
+        }
+        .date-btn.active {
+            background: #D37586;
+            color: #fff;
+        }
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin: 6px 0 4px;
+        }
+        .time-btn {
+            padding: 8px;
+            background: #fff;
+            border: 2px solid #F5E1E4;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s, border 0.2s, transform 0.1s;
+            font-family: 'Cairo';
+            color: #333;
+            font-size: 0.8rem;
+            will-change: transform;
+        }
+        .time-btn:active {
+            transform: scale(0.93);
+        }
+        .time-btn.active {
+            background: #D37586;
+            color: #fff;
+            border-color: #D37586;
+        }
+
+        /* ===== VIDEO CALL (وجه لوجه) ===== */
+        #videocall {
+            background: #000;
+            position: relative;
+        }
+        #videocall .doctor-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            z-index: 0;
+        }
+        #videocall .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 1;
+        }
+        #videocall .selfie-window {
+            position: absolute;
+            bottom: 120px;
+            right: 20px;
+            width: 110px;
+            height: 150px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            background: url('https://randomuser.me/api/portraits/women/79.jpg') center/cover no-repeat;
+            z-index: 5;
+        }
+        #videocall .selfie-window .selfie-label {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        #videocall .video-controls-full {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 0 20px;
+        }
+        .control-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .control-btn:active {
+            transform: scale(0.88);
+        }
+        .control-btn.end {
+            background: #E53935;
+            color: #fff;
+        }
+        .control-btn.muted {
+            background: rgba(229, 57, 53, 0.6) !important;
+        }
+        .control-btn.cam-off {
+            background: rgba(229, 57, 53, 0.6) !important;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #D37586;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            font-family: 'Cairo';
+            margin: 10px 0 4px;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-emergency {
+            width: 100%;
+            padding: 14px;
+            background: #E53935;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            font-family: 'Cairo';
+            margin: 8px 0 6px;
+        }
+        .btn-emergency:active {
+            transform: scale(0.97);
+        }
+        .emergency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 8px 0;
+        }
+        .emergency-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s;
+            border: 1px solid #F5E1E4;
+            will-change: transform;
+        }
+        .emergency-card:active {
+            transform: scale(0.95);
+        }
+        .emergency-icon {
+            font-size: 1.8rem;
+            color: #D37586;
+            margin-bottom: 4px;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid #F5E1E4;
+            display: none;
+            justify-content: space-around;
+            padding: 4px 0 12px;
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            cursor: pointer;
+            color: #999;
+            font-size: 0.55rem;
+            font-weight: 600;
+            transition: color 0.2s;
+            padding: 2px 0;
+            border: none;
+            background: transparent;
+            font-family: 'Cairo';
+        }
+        .nav-item i {
+            font-size: 1.3rem;
+        }
+        .nav-item.active {
+            color: #D37586;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            max-width: 270px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .modal-text {
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        .modal-btn {
+            background: #D37586;
+            color: #fff;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: transform 0.15s;
+            font-family: 'Cairo';
+        }
+        .modal-btn:active {
+            transform: scale(0.95);
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- ===== SPLASH (خلفية 1.png - زر منزل للأسفل ومتوهج) ===== -->
+        <div class="screen active" id="splash">
+            <div style="flex:1;"></div> <!-- دفع للأسفل -->
+            <button class="btn-splash" onclick="goTo('login')">ابدئي الآن</button>
+            <div style="flex:0.5;"></div> <!-- مسافة أسفل -->
+        </div>
+
+        <!-- ===== LOGIN ===== -->
+        <div class="screen" id="login">
+            <div class="login-card">
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-title">تسجيل الدخول</div>
+                <div class="login-desc">أدخلي بيانات حسابك</div>
+                <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="email" />
+                <input type="password" class="form-input" placeholder="كلمة المرور" id="password" />
+                <button class="btn-login" onclick="doLogin()">دخول</button>
+                <div class="signup-link">ليس لديك حساب؟ <a onclick="goTo('signup')">إنشاء حساب</a></div>
+            </div>
+        </div>
+
+        <!-- ===== SIGNUP (شاشة إنشاء حساب جديدة) ===== -->
+        <div class="screen" id="signup">
+            <div class="login-card">
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-title">إنشاء حساب</div>
+                <div class="login-desc">أدخلي بياناتك للتسجيل</div>
+                <input type="text" class="form-input" placeholder="الاسم الكامل" id="fullname" />
+                <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="signupEmail" />
+                <input type="password" class="form-input" placeholder="كلمة المرور" id="signupPass" />
+                <input type="password" class="form-input" placeholder="تأكيد كلمة المرور" id="signupConfirm" />
+                <button class="btn-login" onclick="showModal('تم', 'تم إنشاء الحساب بنجاح ✓'); goTo('login');">إنشاء حساب</button>
+                <div class="signup-link">لديك حساب؟ <a onclick="goTo('login')">تسجيل الدخول</a></div>
+            </div>
+        </div>
+
+        <!-- ===== HOME ===== -->
+        <div class="screen" id="home">
+            <div class="header-home">
+                <div class="header-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="header-text">
+                    <div class="header-name">مرحباً بكِ، سارة!</div>
+                    <div class="header-subtext">كيف يمكننا مساعدتكِ؟</div>
+                </div>
+            </div>
+            <div class="grid-cards">
+                <div class="card-home card-1" onclick="goTo('pregnancy')"><i class="fas fa-baby"></i> متابعة الحمل</div>
+                <div class="card-home card-2" onclick="goTo('appointments')"><i class="fas fa-calendar-check"></i> حجز موعد</div>
+                <div class="card-home card-3" onclick="goTo('mental')"><i class="fas fa-heart"></i> استشارة نفسية</div>
+                <div class="card-home card-4" onclick="goTo('tips')"><i class="fas fa-lightbulb"></i> نصائح يومية</div>
+                <div class="card-home card-5" onclick="goTo('postpartum')"><i class="fas fa-baby-carriage"></i> ما بعد الولادة</div>
+                <div class="card-home card-6" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> الطوارئ</div>
+            </div>
+        </div>
+
+        <!-- ===== PREGNANCY ===== -->
+        <div class="screen" id="pregnancy">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">متابعة الحمل</div>
+            </div>
+            <div class="detail-content">
+                <div class="card text-center">
+                    <div class="progress-ring">
+                        <div class="progress-inner">
+                            <div class="week-number">24</div>
+                            <div class="week-text">أسبوع</div>
+                        </div>
+                    </div>
+                    <p style="font-weight:700;color:#333;margin:4px 0 2px;">أنتِ في الأسبوع 24</p>
+                    <p style="color:#8FA89B;font-size:0.8rem;margin-bottom:6px;">باقي 16 أسبوعاً</p>
+                    <div class="pregnancy-progress-bar"><div></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-bullseye"></i> التطور الحالي</div>
+                    <div class="card-text">• الجنين بوزن 600 غرام<br />• نمو متسارع وحركات نشطة</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-hand-holding-heart"></i> نصائح الأسبوع</div>
+                    <div class="card-text">• راحة كافية • أطعمة غنية بالحديد • تمارين خفيفة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== APPOINTMENTS ===== -->
+        <div class="screen" id="appointments">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">حجز موعد</div>
+            </div>
+            <div class="detail-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-ul"></i> الخدمة</div>
+                    <div class="radio-group">
+                        <label class="radio-item"><input type="radio" name="service" checked /> <i class="fas fa-baby" style="color:#D37586;"></i> متابعة الحمل</label>
+                        <label class="radio-item"><input type="radio" name="service" /> <i class="fas fa-heart" style="color:#D37586;"></i> استشارة نفسية</label>
+                        <label class="radio-item"><input type="radio" name="service" /> <i class="fas fa-stethoscope" style="color:#D37586;"></i> استشارة طبية</label>
+                        <label class="radio-item"><input type="radio" name="service" /> <i class="fas fa-baby-carriage" style="color:#D37586;"></i> ما بعد الولادة</label>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-calendar-day"></i> التاريخ</div>
+                    <div class="date-grid">
+                        <button class="date-btn" onclick="selectDate(this)">1</button>
+                        <button class="date-btn" onclick="selectDate(this)">2</button>
+                        <button class="date-btn" onclick="selectDate(this)">3</button>
+                        <button class="date-btn" onclick="selectDate(this)">4</button>
+                        <button class="date-btn active" onclick="selectDate(this)">5</button>
+                        <button class="date-btn" onclick="selectDate(this)">6</button>
+                        <button class="date-btn" onclick="selectDate(this)">7</button>
+                        <button class="date-btn" onclick="selectDate(this)">8</button>
+                        <button class="date-btn" onclick="selectDate(this)">9</button>
+                        <button class="date-btn" onclick="selectDate(this)">10</button>
+                        <button class="date-btn" onclick="selectDate(this)">11</button>
+                        <button class="date-btn" onclick="selectDate(this)">12</button>
+                        <button class="date-btn" onclick="selectDate(this)">13</button>
+                        <button class="date-btn" onclick="selectDate(this)">14</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-clock"></i> الوقت</div>
+                    <div class="time-slots">
+                        <button class="time-btn" onclick="selectTime(this)">9:00 ص</button>
+                        <button class="time-btn" onclick="selectTime(this)">10:00 ص</button>
+                        <button class="time-btn active" onclick="selectTime(this)">11:00 ص</button>
+                        <button class="time-btn" onclick="selectTime(this)">1:00 م</button>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="confirmAppointment()"><i class="fas fa-check-circle"></i> تأكيد الموعد</button>
+            </div>
+        </div>
+
+        <!-- ===== MENTAL HEALTH ===== -->
+        <div class="screen" id="mental">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">استشارة نفسية</div>
+            </div>
+            <div class="detail-content">
+                <div class="card text-center">
+                    <div style="font-size:2.6rem;color:#D37586;margin-bottom:6px;"><i class="fas fa-brain"></i></div>
+                    <div class="card-title" style="justify-content:center;">صحتك النفسية أولوية</div>
+                    <div class="card-text" style="margin-bottom:10px;">جلسات مع متخصصين للحوامل والأمهات</div>
+                    <button class="btn-primary" onclick="goTo('videocall')"><i class="fas fa-video"></i> احجزي جلسة فيديو</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-check"></i> الموضوعات الشائعة</div>
+                    <div class="card-text">• القلق والتوتر • الاكتئاب • تقلبات المزاج</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== VIDEO CALL (وجه لوجه) ===== -->
+        <div class="screen" id="videocall">
+            <div class="doctor-bg"></div>
+            <div class="overlay"></div>
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('mental')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">جلسة فيديو</div>
+            </div>
+            <div class="selfie-window">
+                <div class="selfie-label">أنتِ</div>
+            </div>
+            <div class="video-controls-full">
+                <button class="control-btn mic" onclick="toggleMic(this)"><i class="fas fa-microphone"></i></button>
+                <button class="control-btn camera" onclick="toggleCamera(this)"><i class="fas fa-video"></i></button>
+                <button class="control-btn end" onclick="goTo('home')"><i class="fas fa-phone-slash"></i></button>
+            </div>
+        </div>
+
+        <!-- ===== POSTPARTUM ===== -->
+        <div class="screen" id="postpartum">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">ما بعد الولادة</div>
+            </div>
+            <div class="detail-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-heart-pulse"></i> التعافي الجسدي</div>
+                    <div class="card-text">• راحة تامة أول أسبوعين • تجنب الأنشطة الشاقة • تمارين قاع الحوض</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-brain"></i> الصحة النفسية</div>
+                    <div class="card-text">اطلبي الدعم من الأهل والمتخصصين متى احتجتِ</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-utensils"></i> التغذية والراحة</div>
+                    <div class="card-text">• طعام صحي متوازن • سوائل كافية • نوم منتظم</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DAILY TIPS ===== -->
+        <div class="screen" id="tips">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">نصائح يومية</div>
+            </div>
+            <div class="detail-content">
+                <div class="card" style="border-right:4px solid #D37586;">
+                    <div class="card-title"><i class="fas fa-sun" style="color:#f4a460;"></i> فيتامين D</div>
+                    <div class="card-text">تناوليه من الحليب والأسماك والتعرض للشمس</div>
+                </div>
+                <div class="card" style="border-right:4px solid #7A9B8A;">
+                    <div class="card-title"><i class="fas fa-droplet" style="color:#4a90d9;"></i> الترطيب</div>
+                    <div class="card-text">اشربي 8-10 أكواب من الماء يومياً</div>
+                </div>
+                <div class="card" style="border-right:4px solid #A67FB5;">
+                    <div class="card-title"><i class="fas fa-person-walking" style="color:#7a9b8a;"></i> المشي</div>
+                    <div class="card-text">قومي بنزهة خفيفة لمدة 30 دقيقة يومياً</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== EMERGENCY ===== -->
+        <div class="screen" id="emergency">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">الطوارئ</div>
+            </div>
+            <div class="detail-content">
+                <button class="btn-emergency" onclick="callEmergency()"><i class="fas fa-phone-alt"></i> اتصل بالطوارئ الآن</button>
+                <div class="emergency-grid">
+                    <div class="emergency-card" onclick="contactDoctor()">
+                        <div class="emergency-icon"><i class="fas fa-phone"></i></div>
+                        <div style="font-weight:600;color:#333;font-size:0.85rem;">اتصال بالطبيب</div>
+                    </div>
+                    <div class="emergency-card" onclick="contactHospital()">
+                        <div class="emergency-icon"><i class="fas fa-hospital"></i></div>
+                        <div style="font-weight:600;color:#333;font-size:0.85rem;">اتصال بالمستشفى</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-triangle-exclamation" style="color:#E53935;"></i> أعراض طارئة</div>
+                    <div class="card-text">نزيف مهبلي • آلام حادة • فقدان وعي • تسمم حمل</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RECORDS ===== -->
+        <div class="screen" id="records">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">الملف الصحي</div>
+            </div>
+            <div class="detail-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-pills"></i> الأدوية</div>
+                    <div class="card-text">فيتامينات الحمل (حمض الفوليك + حديد)</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-stethoscope"></i> الفحوصات</div>
+                    <div class="card-text">تحليل الدم ✓ • الموجات فوق الصوتية ✓</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-pen"></i> الملاحظات</div>
+                    <div class="card-text">آخر متابعة: 15 يونيو • القادم: 22 يونيو</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <div class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" onclick="goTo('home')"><i class="fas fa-home"></i> الرئيسية</button>
+            <button class="nav-item" onclick="goTo('pregnancy')"><i class="fas fa-chart-line"></i> المتابعة</button>
+            <button class="nav-item" onclick="goTo('records')"><i class="fas fa-folder"></i> الملف</button>
+            <button class="nav-item" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> الطوارئ</button>
+        </div>
+
+        <!-- ===== MODAL ===== -->
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <div class="modal-title" id="modalTitle">تم التأكيد</div>
+                <div class="modal-text" id="modalText">تم حفظ البيانات بنجاح</div>
+                <button class="modal-btn" onclick="closeModal()">حسناً</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== PWA: تسجيل Service Worker =====
+        (function registerSW() {
+            try {
+                const swCode = `
+                    self.addEventListener('install', e => {
+                        e.waitUntil(
+                            caches.open('laki-v1').then(cache => {
+                                return cache.addAll([
+                                    '.',
+                                    'index.html',
+                                    'logo.png',
+                                    '1.png',
+                                    'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
+                                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+                                ]);
+                            })
+                        );
+                    });
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(
+                            caches.match(e.request).then(res => res || fetch(e.request))
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl, { scope: '.' })
+                    .then(() => console.log('Service Worker registered'))
+                    .catch(() => console.log('SW registration failed'));
+            } catch (_) { /* ignore */ }
+        })();
+
+        // ===== NAVIGATION =====
+        function goTo(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screen);
+            if (target) target.classList.add('active');
+
+            const nav = document.getElementById('bottomNav');
+            const mainScreens = ['home', 'pregnancy', 'records', 'emergency'];
+            nav.style.display = mainScreens.includes(screen) ? 'flex' : 'none';
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (mainScreens.includes(screen)) {
+                const idx = mainScreens.indexOf(screen);
+                const items = document.querySelectorAll('.nav-item');
+                if (items[idx]) items[idx].classList.add('active');
+            }
+        }
+
+        // ===== LOGIN =====
+        function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            if (email && pass) goTo('home');
+            else showModal('تنبيه', 'الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+        }
+
+        // ===== APPOINTMENTS =====
+        function selectDate(el) {
+            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function selectTime(el) {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function confirmAppointment() {
+            showModal('تم التأكيد', 'تم حجز موعدك بنجاح ✓');
+        }
+
+        // ===== VIDEO CONTROLS =====
+        function toggleMic(btn) {
+            btn.classList.toggle('muted');
+            btn.innerHTML = btn.classList.contains('muted') ?
+                '<i class="fas fa-microphone-slash"></i>' :
+                '<i class="fas fa-microphone"></i>';
+        }
+
+        function toggleCamera(btn) {
+            btn.classList.toggle('cam-off');
+            btn.innerHTML = btn.classList.contains('cam-off') ?
+                '<i class="fas fa-video-slash"></i>' :
+                '<i class="fas fa-video"></i>';
+        }
+
+        // ===== EMERGENCY =====
+        function callEmergency() { showModal('الطوارئ', 'جارٍ الاتصال بخدمة الطوارئ 🚑'); }
+
+        function contactDoctor() { showModal('اتصال بالطبيب', 'جارٍ الاتصال بالطبيب المتابع...'); }
+
+        function contactHospital() { showModal('اتصال بالمستشفى', 'جارٍ الاتصال بمستشفى النور...'); }
+
+        // ===== MODAL =====
+        function showModal(title, text) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+
+</body>
+</html>
