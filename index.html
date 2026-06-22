@@ -5,9 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>لَكِ - تطبيق الأمومة</title>
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="logo.png" />
+    <!-- PWA Manifest مضمن (بدون ملف خارجي) -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,{
+        &quot;name&quot;:&quot;لَكِ - تطبيق الأمومة&quot;,
+        &quot;short_name&quot;:&quot;لَكِ&quot;,
+        &quot;description&quot;:&quot;رفيقة المرأة في رحلة الأمومة&quot;,
+        &quot;start_url&quot;:&quot;.&quot;,
+        &quot;display&quot;:&quot;standalone&quot;,
+        &quot;background_color&quot;:&quot;#ffffff&quot;,
+        &quot;theme_color&quot;:&quot;#D37586&quot;,
+        &quot;icons&quot;:[
+            {&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%23D37586'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white' font-family='Arial'%3E🤱%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}
+        ]
+    }" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%23D37586'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white' font-family='Arial'%3E🤱%3C/text%3E%3C/svg%3E" />
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -165,6 +176,22 @@
             object-fit: contain;
             display: block;
         }
+        /* إذا لم تظهر الصورة نعرض أيقونة احتياطية */
+        .login-logo .fallback-icon {
+            width: 100%;
+            height: 100%;
+            display: none;
+            font-size: 3rem;
+            color: #D37586;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-logo img:not([src])+.fallback-icon,
+        .login-logo img[src=""]+.fallback-icon,
+        .login-logo img.error+.fallback-icon {
+            display: flex;
+        }
+
         .login-title {
             font-size: 1.3rem;
             font-weight: 700;
@@ -249,6 +276,21 @@
             object-fit: contain;
             display: block;
         }
+        .header-home .header-logo .fallback-icon {
+            display: none;
+            width: 100%;
+            height: 100%;
+            font-size: 1.8rem;
+            color: #D37586;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-home .header-logo img:not([src])+.fallback-icon,
+        .header-home .header-logo img[src=""]+.fallback-icon,
+        .header-home .header-logo img.error+.fallback-icon {
+            display: flex;
+        }
+
         .header-text {
             flex: 1;
             min-width: 0;
@@ -807,6 +849,54 @@
         .text-center {
             text-align: center;
         }
+
+        /* ===== رسالة توجيهية للتثبيت ===== */
+        .install-banner {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 200;
+            text-align: center;
+            max-width: 90%;
+            display: none;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .install-banner i {
+            color: #D37586;
+            margin-left: 8px;
+        }
+        .install-banner .btn-install {
+            background: #D37586;
+            color: #fff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.15s;
+            font-family: 'Cairo';
+        }
+        .install-banner .btn-install:active {
+            transform: scale(0.95);
+        }
+        @media (display-mode: standalone) {
+            .install-banner {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -823,7 +913,10 @@
         <!-- ===== LOGIN ===== -->
         <div class="screen" id="login">
             <div class="login-card">
-                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-logo">
+                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
+                    <div class="fallback-icon">🤱</div>
+                </div>
                 <div class="login-title">تسجيل الدخول</div>
                 <div class="login-desc">أدخلي بيانات حسابك</div>
                 <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="email" />
@@ -836,7 +929,10 @@
         <!-- ===== SIGNUP ===== -->
         <div class="screen" id="signup">
             <div class="login-card">
-                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-logo">
+                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
+                    <div class="fallback-icon">🤱</div>
+                </div>
                 <div class="login-title">إنشاء حساب</div>
                 <div class="login-desc">أدخلي بياناتك للتسجيل</div>
                 <input type="text" class="form-input" placeholder="الاسم الكامل" id="fullname" />
@@ -851,7 +947,10 @@
         <!-- ===== HOME ===== -->
         <div class="screen" id="home">
             <div class="header-home">
-                <div class="header-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="header-logo">
+                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
+                    <div class="fallback-icon">🤱</div>
+                </div>
                 <div class="header-text">
                     <div class="header-name">مرحباً بكِ، سارة!</div>
                     <div class="header-subtext">كيف يمكننا مساعدتكِ؟</div>
@@ -1081,6 +1180,13 @@
             <button class="nav-item" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> الطوارئ</button>
         </div>
 
+        <!-- ===== INSTALL BANNER (توجيهي) ===== -->
+        <div class="install-banner" id="installBanner">
+            <i class="fas fa-download"></i>
+            <span>ثبّت التطبيق على شاشتك الرئيسية</span>
+            <button class="btn-install" onclick="installApp()">تثبيت</button>
+        </div>
+
         <!-- ===== MODAL ===== -->
         <div class="modal" id="modal">
             <div class="modal-content">
@@ -1106,12 +1212,69 @@
             img.src = '1.png';
         })();
 
-        // ===== تسجيل Service Worker للتثبيت =====
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('✅ Service Worker registered'))
-                .catch(() => console.log('⚠️ SW registration failed'));
+        // ===== PWA: تسجيل Service Worker باستخدام Blob URL =====
+        (function registerSW() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const swCode = `
+                        self.addEventListener('install', e => {
+                            e.waitUntil(
+                                caches.open('laki-v1').then(cache => {
+                                    return cache.addAll([
+                                        '.',
+                                        'index.html',
+                                        'logo.png',
+                                        '1.png'
+                                    ]);
+                                })
+                            );
+                        });
+                        self.addEventListener('fetch', e => {
+                            e.respondWith(
+                                caches.match(e.request).then(res => res || fetch(e.request))
+                            );
+                        });
+                    `;
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(swUrl, { scope: '.' })
+                        .then(() => {
+                            console.log('✅ Service Worker registered');
+                            // إظهار رسالة التثبيت إذا لم يكن مثبتاً
+                            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                                document.getElementById('installBanner').style.display = 'flex';
+                            }
+                        })
+                        .catch(() => console.log('⚠️ SW registration failed'));
+                } catch (_) { /* ignore */ }
+            }
+        })();
+
+        // ===== تثبيت التطبيق (للمتصفحات التي تدعم beforeinstallprompt) =====
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').style.display = 'flex';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').style.display = 'none';
+                });
+            } else {
+                // توجيه المستخدم إلى إضافة التطبيق يدوياً
+                showModal('تثبيت التطبيق', 'استخدم زر "إضافة إلى الشاشة الرئيسية" في متصفحك.');
+            }
         }
+
+        // إخفاء البانر عند التثبيت
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installBanner').style.display = 'none';
+        });
 
         // ===== NAVIGATION =====
         function goTo(screen) {
