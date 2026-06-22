@@ -5,21 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>لَكِ - تطبيق الأمومة</title>
 
-    <!-- PWA Manifest (مضمن عبر رابط خارجي لتوافق أفضل) -->
-    <link rel="manifest" href="data:application/json;charset=utf-8,{
-        &quot;name&quot;:&quot;لَكِ - تطبيق الأمومة&quot;,
-        &quot;short_name&quot;:&quot;لَكِ&quot;,
-        &quot;description&quot;:&quot;رفيقة المرأة في رحلة الأمومة&quot;,
-        &quot;start_url&quot;:&quot;.&quot;,
-        &quot;display&quot;:&quot;standalone&quot;,
-        &quot;background_color&quot;:&quot;#ffffff&quot;,
-        &quot;theme_color&quot;:&quot;#D37586&quot;,
-        &quot;icons&quot;:[
-            {&quot;src&quot;:&quot;logo.png&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},
-            {&quot;src&quot;:&quot;logo.png&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}
-        ]
-    }" />
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="logo.png" />
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -81,14 +70,12 @@
             }
         }
 
-        /* ===== SPLASH مع خلفية 1.png + fallback ===== */
+        /* ===== SPLASH مع خلفية 1.png ===== */
         #splash {
             justify-content: flex-start;
             align-items: center;
             text-align: center;
-            /* خلفية أساسية */
             background: #FDE2D3;
-            /* استخدام الصورة مع fallback */
             background-image: url('1.png');
             background-size: cover;
             background-position: center;
@@ -96,26 +83,22 @@
             position: relative;
             padding-top: 20vh;
         }
-        /* إذا لم تظهر الصورة، نعرض تدرج لوني بديل */
+        /* Fallback إذا لم تظهر الصورة */
         #splash::before {
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(135deg, #FDE2D3 0%, #F5E1E4 100%);
             z-index: 0;
-            opacity: 0; /* مخفي افتراضياً */
+            opacity: 0;
             transition: opacity 0.3s;
         }
-        /* عندما تفشل الصورة، نظهر الـ fallback */
         #splash.no-image::before {
             opacity: 1;
         }
         #splash>* {
             position: relative;
             z-index: 2;
-        }
-        #splash .spacer {
-            flex: 1;
         }
         .btn-splash {
             background: rgba(211, 117, 134, 0.95);
@@ -571,7 +554,7 @@
             border-color: #D37586;
         }
 
-        /* ===== VIDEO CALL (وجه لوجه) ===== */
+        /* ===== VIDEO CALL ===== */
         #videocall {
             background: #000;
             position: relative;
@@ -823,34 +806,6 @@
         }
         .text-center {
             text-align: center;
-        }
-
-        /* ===== رسالة توجيهية للتثبيت ===== */
-        .install-prompt {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            display: none;
-            z-index: 200;
-            text-align: center;
-            max-width: 90%;
-            pointer-events: none;
-        }
-        .install-prompt i {
-            margin-left: 8px;
-            color: #D37586;
-        }
-        @media (display-mode: standalone) {
-            .install-prompt {
-                display: none !important;
-            }
         }
     </style>
 </head>
@@ -1126,11 +1081,6 @@
             <button class="nav-item" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> الطوارئ</button>
         </div>
 
-        <!-- ===== INSTALL PROMPT (توجيهي) ===== -->
-        <div class="install-prompt" id="installPrompt">
-            <i class="fas fa-download"></i> يمكنك تثبيت هذا التطبيق على جهازك
-        </div>
-
         <!-- ===== MODAL ===== -->
         <div class="modal" id="modal">
             <div class="modal-content">
@@ -1148,7 +1098,6 @@
             const splash = document.getElementById('splash');
             const img = new Image();
             img.onload = function() {
-                // الصورة موجودة - نزيل fallback
                 splash.classList.remove('no-image');
             };
             img.onerror = function() {
@@ -1157,53 +1106,12 @@
             img.src = '1.png';
         })();
 
-        // ===== PWA: تسجيل Service Worker مع دعم التثبيت =====
-        (function registerSW() {
-            try {
-                // نتحقق مما إذا كان المتصفح يدعم service workers
-                if ('serviceWorker' in navigator) {
-                    // نستخدم مساراً ثابتاً لملف الخدمة (سيتم إنشاؤه ديناميكياً)
-                    const swCode = `
-                        self.addEventListener('install', e => {
-                            e.waitUntil(
-                                caches.open('laki-v1').then(cache => {
-                                    return cache.addAll([
-                                        '.',
-                                        'index.html',
-                                        'logo.png',
-                                        '1.png',
-                                        'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
-                                        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
-                                    ]);
-                                })
-                            );
-                        });
-                        self.addEventListener('fetch', e => {
-                            e.respondWith(
-                                caches.match(e.request).then(res => res || fetch(e.request))
-                            );
-                        });
-                    `;
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl, { scope: '.' })
-                        .then(() => {
-                            console.log('✅ Service Worker registered');
-                            // إظهار رسالة التثبيت إذا لم يكن مثبتاً
-                            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                                document.getElementById('installPrompt').style.display = 'block';
-                            }
-                        })
-                        .catch(() => console.log('⚠️ SW registration failed ( قد يكون بسبب بروتوكول file:// )'));
-                }
-            } catch (_) { /* تجاهل الأخطاء */ }
-        })();
-
-        // ===== إخفاء رسالة التثبيت عند التثبيت =====
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            document.getElementById('installPrompt').style.display = 'none';
-        });
+        // ===== تسجيل Service Worker للتثبيت =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('✅ Service Worker registered'))
+                .catch(() => console.log('⚠️ SW registration failed'));
+        }
 
         // ===== NAVIGATION =====
         function goTo(screen) {
