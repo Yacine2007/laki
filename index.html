@@ -4,27 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>لَكِ - تطبيق الأمومة</title>
-
-    <!-- PWA Manifest مضمن (بدون ملف خارجي) -->
-    <link rel="manifest" href="data:application/json;charset=utf-8,{
-        &quot;name&quot;:&quot;لَكِ - تطبيق الأمومة&quot;,
-        &quot;short_name&quot;:&quot;لَكِ&quot;,
-        &quot;description&quot;:&quot;رفيقة المرأة في رحلة الأمومة&quot;,
-        &quot;start_url&quot;:&quot;.&quot;,
-        &quot;display&quot;:&quot;standalone&quot;,
-        &quot;background_color&quot;:&quot;#ffffff&quot;,
-        &quot;theme_color&quot;:&quot;#D37586&quot;,
-        &quot;icons&quot;:[
-            {&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%23D37586'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white' font-family='Arial'%3E🤱%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}
-        ]
-    }" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='256' fill='%23D37586'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white' font-family='Arial'%3E🤱%3C/text%3E%3C/svg%3E" />
+    
+    <!-- ربط ملف البيان (manifest) -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="logo.png" />
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* ===== RESET & FULLSCREEN ===== */
         * {
             margin: 0;
             padding: 0;
@@ -38,7 +26,6 @@
             font-family: 'Cairo', sans-serif;
             background: #ffffff;
             direction: rtl;
-            -webkit-font-smoothing: antialiased;
         }
         .app {
             width: 100%;
@@ -51,15 +38,12 @@
             flex-direction: column;
             position: relative;
         }
-
-        /* ===== SCREENS ===== */
         .screen {
             display: none;
             flex-direction: column;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            animation: fadeIn 0.2s ease;
             position: absolute;
             top: 0;
             left: 0;
@@ -70,18 +54,7 @@
             display: flex;
             z-index: 2;
         }
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(4px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== SPLASH مع خلفية 1.png ===== */
+        /* ===== SPLASH ===== */
         #splash {
             justify-content: flex-start;
             align-items: center;
@@ -94,7 +67,6 @@
             position: relative;
             padding-top: 20vh;
         }
-        /* Fallback إذا لم تظهر الصورة */
         #splash::before {
             content: '';
             position: absolute;
@@ -126,7 +98,6 @@
             margin-bottom: 40px;
             animation: glow-pulse 2.5s infinite ease-in-out;
             transition: transform 0.15s;
-            will-change: transform, box-shadow;
         }
         .btn-splash:active {
             transform: scale(0.94);
@@ -176,22 +147,6 @@
             object-fit: contain;
             display: block;
         }
-        /* إذا لم تظهر الصورة نعرض أيقونة احتياطية */
-        .login-logo .fallback-icon {
-            width: 100%;
-            height: 100%;
-            display: none;
-            font-size: 3rem;
-            color: #D37586;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-logo img:not([src])+.fallback-icon,
-        .login-logo img[src=""]+.fallback-icon,
-        .login-logo img.error+.fallback-icon {
-            display: flex;
-        }
-
         .login-title {
             font-size: 1.3rem;
             font-weight: 700;
@@ -229,7 +184,6 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
-            will-change: transform;
         }
         .btn-login:active {
             transform: scale(0.96);
@@ -246,7 +200,7 @@
             cursor: pointer;
         }
 
-        /* ===== HEADER (ثابت) ===== */
+        /* ===== HEADER ===== */
         .detail-header,
         .header-home {
             flex-shrink: 0;
@@ -276,21 +230,6 @@
             object-fit: contain;
             display: block;
         }
-        .header-home .header-logo .fallback-icon {
-            display: none;
-            width: 100%;
-            height: 100%;
-            font-size: 1.8rem;
-            color: #D37586;
-            align-items: center;
-            justify-content: center;
-        }
-        .header-home .header-logo img:not([src])+.fallback-icon,
-        .header-home .header-logo img[src=""]+.fallback-icon,
-        .header-home .header-logo img.error+.fallback-icon {
-            display: flex;
-        }
-
         .header-text {
             flex: 1;
             min-width: 0;
@@ -316,7 +255,6 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.5);
             transition: transform 0.15s, background 0.2s;
-            will-change: transform;
             flex-shrink: 0;
         }
         .back-btn:active {
@@ -331,7 +269,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* في شاشة الفيديو header شفاف */
         #videocall .detail-header {
             background: transparent;
             position: absolute;
@@ -373,9 +310,6 @@
         #home {
             background: #FFFDFB;
         }
-        #home .header-home {
-            border-radius: 0 0 20px 20px;
-        }
         .grid-cards {
             flex: 1;
             display: grid;
@@ -402,7 +336,6 @@
             border: none;
             font-family: 'Cairo';
             gap: 6px;
-            will-change: transform;
         }
         .card-home i {
             font-size: 2.2rem;
@@ -559,7 +492,6 @@
             transition: background 0.2s, color 0.2s, transform 0.1s;
             font-family: 'Cairo';
             font-size: 0.8rem;
-            will-change: transform;
         }
         .date-btn:active {
             transform: scale(0.9);
@@ -585,7 +517,6 @@
             font-family: 'Cairo';
             color: #333;
             font-size: 0.8rem;
-            will-change: transform;
         }
         .time-btn:active {
             transform: scale(0.93);
@@ -662,7 +593,6 @@
             justify-content: center;
             font-size: 1.3rem;
             transition: background 0.2s, transform 0.15s;
-            will-change: transform;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(4px);
             color: #fff;
@@ -694,7 +624,6 @@
             font-size: 0.95rem;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
-            will-change: transform;
             font-family: 'Cairo';
             margin: 10px 0 4px;
         }
@@ -712,7 +641,6 @@
             font-size: 0.95rem;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
-            will-change: transform;
             font-family: 'Cairo';
             margin: 8px 0 6px;
         }
@@ -733,7 +661,6 @@
             cursor: pointer;
             transition: transform 0.15s;
             border: 1px solid #F5E1E4;
-            will-change: transform;
         }
         .emergency-card:active {
             transform: scale(0.95);
@@ -754,7 +681,6 @@
             max-width: 100%;
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid #F5E1E4;
             display: none;
             justify-content: space-around;
@@ -791,7 +717,6 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
             z-index: 300;
             align-items: center;
             justify-content: center;
@@ -849,54 +774,6 @@
         .text-center {
             text-align: center;
         }
-
-        /* ===== رسالة توجيهية للتثبيت ===== */
-        .install-banner {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            z-index: 200;
-            text-align: center;
-            max-width: 90%;
-            display: none;
-            gap: 12px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-        .install-banner i {
-            color: #D37586;
-            margin-left: 8px;
-        }
-        .install-banner .btn-install {
-            background: #D37586;
-            color: #fff;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: transform 0.15s;
-            font-family: 'Cairo';
-        }
-        .install-banner .btn-install:active {
-            transform: scale(0.95);
-        }
-        @media (display-mode: standalone) {
-            .install-banner {
-                display: none !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -913,10 +790,7 @@
         <!-- ===== LOGIN ===== -->
         <div class="screen" id="login">
             <div class="login-card">
-                <div class="login-logo">
-                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
-                    <div class="fallback-icon">🤱</div>
-                </div>
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
                 <div class="login-title">تسجيل الدخول</div>
                 <div class="login-desc">أدخلي بيانات حسابك</div>
                 <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="email" />
@@ -929,10 +803,7 @@
         <!-- ===== SIGNUP ===== -->
         <div class="screen" id="signup">
             <div class="login-card">
-                <div class="login-logo">
-                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
-                    <div class="fallback-icon">🤱</div>
-                </div>
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
                 <div class="login-title">إنشاء حساب</div>
                 <div class="login-desc">أدخلي بياناتك للتسجيل</div>
                 <input type="text" class="form-input" placeholder="الاسم الكامل" id="fullname" />
@@ -947,10 +818,7 @@
         <!-- ===== HOME ===== -->
         <div class="screen" id="home">
             <div class="header-home">
-                <div class="header-logo">
-                    <img src="logo.png" alt="لَكِ" onerror="this.classList.add('error');" />
-                    <div class="fallback-icon">🤱</div>
-                </div>
+                <div class="header-logo"><img src="logo.png" alt="لَكِ" /></div>
                 <div class="header-text">
                     <div class="header-name">مرحباً بكِ، سارة!</div>
                     <div class="header-subtext">كيف يمكننا مساعدتكِ؟</div>
@@ -1180,13 +1048,6 @@
             <button class="nav-item" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> الطوارئ</button>
         </div>
 
-        <!-- ===== INSTALL BANNER (توجيهي) ===== -->
-        <div class="install-banner" id="installBanner">
-            <i class="fas fa-download"></i>
-            <span>ثبّت التطبيق على شاشتك الرئيسية</span>
-            <button class="btn-install" onclick="installApp()">تثبيت</button>
-        </div>
-
         <!-- ===== MODAL ===== -->
         <div class="modal" id="modal">
             <div class="modal-content">
@@ -1199,7 +1060,7 @@
     </div>
 
     <script>
-        // ===== التحقق من تحميل الصورة وإظهار fallback =====
+        // ===== التحقق من تحميل الصورة =====
         (function checkImage() {
             const splash = document.getElementById('splash');
             const img = new Image();
@@ -1212,69 +1073,12 @@
             img.src = '1.png';
         })();
 
-        // ===== PWA: تسجيل Service Worker باستخدام Blob URL =====
-        (function registerSW() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const swCode = `
-                        self.addEventListener('install', e => {
-                            e.waitUntil(
-                                caches.open('laki-v1').then(cache => {
-                                    return cache.addAll([
-                                        '.',
-                                        'index.html',
-                                        'logo.png',
-                                        '1.png'
-                                    ]);
-                                })
-                            );
-                        });
-                        self.addEventListener('fetch', e => {
-                            e.respondWith(
-                                caches.match(e.request).then(res => res || fetch(e.request))
-                            );
-                        });
-                    `;
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl, { scope: '.' })
-                        .then(() => {
-                            console.log('✅ Service Worker registered');
-                            // إظهار رسالة التثبيت إذا لم يكن مثبتاً
-                            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                                document.getElementById('installBanner').style.display = 'flex';
-                            }
-                        })
-                        .catch(() => console.log('⚠️ SW registration failed'));
-                } catch (_) { /* ignore */ }
-            }
-        })();
-
-        // ===== تثبيت التطبيق (للمتصفحات التي تدعم beforeinstallprompt) =====
-        let deferredPrompt = null;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBanner').style.display = 'flex';
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    deferredPrompt = null;
-                    document.getElementById('installBanner').style.display = 'none';
-                });
-            } else {
-                // توجيه المستخدم إلى إضافة التطبيق يدوياً
-                showModal('تثبيت التطبيق', 'استخدم زر "إضافة إلى الشاشة الرئيسية" في متصفحك.');
-            }
+        // ===== تسجيل Service Worker =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('✅ Service Worker مسجل'))
+                .catch(() => console.log('⚠️ فشل تسجيل Service Worker'));
         }
-
-        // إخفاء البانر عند التثبيت
-        window.addEventListener('appinstalled', () => {
-            document.getElementById('installBanner').style.display = 'none';
-        });
 
         // ===== NAVIGATION =====
         function goTo(screen) {
