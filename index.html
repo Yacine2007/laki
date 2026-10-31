@@ -1205,12 +1205,13 @@
 
         // ===== LOGIN =====
         function doLogin() {
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const pass = nz(document.getElementById('password').value);
             if (!email || !pass) return showModal('تنبيه', 'الرجاء إدخال البريد الإلكتروني وكلمة المرور');
             const a = ST('acc');
             if (!a) return showModal('تنبيه', 'لا يوجد حساب بعد، أنشئي حساباً أولاً');
-            if (a.email.toLowerCase() !== email.toLowerCase() || a.pass !== pass) return showModal('تنبيه', 'البريد أو كلمة المرور غير صحيحة');
+            if (a.email.trim().toLowerCase() !== email) return showModal('تنبيه', 'هذا البريد غير مسجل');
+            if (nz(a.pass) !== pass) return showModal('تنبيه', 'كلمة المرور غير صحيحة');
             applyLang(); goTo(S.done ? 'home' : 'onb');
         }
 
@@ -1267,7 +1268,15 @@
 
         // ===== v2: state, language, onboarding, calculator, tools, blog =====
         const $ = id => document.getElementById(id), D = 864e5;
-        function ST(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem('lk_' + k)); localStorage.setItem('lk_' + k, JSON.stringify(v)); } catch (e) { return null; } }
+        let STOK = true; const MEM = {};
+        function ST(k, v) {
+            const key = 'lk_' + k;
+            try {
+                if (v === undefined) { const r = localStorage.getItem(key); return r === null ? (MEM[key] === undefined ? null : MEM[key]) : JSON.parse(r); }
+                localStorage.setItem(key, JSON.stringify(v)); MEM[key] = v;
+            } catch (e) { STOK = false; if (v === undefined) return MEM[key] === undefined ? null : MEM[key]; MEM[key] = v; }
+        }
+        const nz = t => String(t || '').trim().replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
         let S = ST('s') || {};
         const td = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
         const fm = d => d.toLocaleDateString({ ar: 'ar-DZ', en: 'en-GB', fr: 'fr-FR' }[S.lang || 'ar'], { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1470,13 +1479,14 @@
         const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         function doSignup() {
             const g = id => $(id).value.trim(), m = t => showModal('تنبيه', t);
-            const name = g('fullname'), email = g('signupEmail'), pass = g('signupPass');
+            const name = g('fullname'), email = g('signupEmail').toLowerCase(), pass = nz($('signupPass').value);
             if (!name || !email || !pass) return m('أدخلي الاسم والبريد وكلمة المرور');
             if (pass.length < 6) return m('كلمة المرور 6 أحرف على الأقل');
-            if (pass !== g('signupConfirm')) return m('كلمتا المرور غير متطابقتين');
+            if (pass !== nz($('signupConfirm').value)) return m('كلمتا المرور غير متطابقتين');
             ST('acc', { name, email, pass, age: g('signupAge'), phone: g('signupPhone') });
             S = {}; ST('s', S); applyLang();
-            goTo('login'); showModal('تم', 'تم إنشاء الحساب بنجاح ✓ سجّلي الدخول الآن');
+            goTo('login'); $('email').value = email; $('password').value = '';
+            showModal(STOK ? 'تم' : 'تنبيه', STOK ? 'تم إنشاء الحساب بنجاح ✓ سجّلي الدخول الآن' : 'تم إنشاء الحساب لكن المتصفح يمنع الحفظ الدائم؛ ستبقى البيانات حتى إغلاق الصفحة فقط. افتحي الملف من متصفح عادي أو من موقع.');
         }
         function logout() { goTo('login'); }
         function renderRec() {
