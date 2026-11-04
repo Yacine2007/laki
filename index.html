@@ -828,6 +828,11 @@
         .stepbar div{height:100%;background:#D37586;border-radius:5px;transition:width .3s}
         [dir=ltr] .back-btn i{transform:scaleX(-1)}
         .detail-content{padding-bottom:70px}
+        .av{width:56px;height:56px;border-radius:50%;background:#FDF2F4;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+        .header-home{position:relative}
+        #bell{position:absolute;top:16px;left:16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#D37586;display:flex;align-items:center;justify-content:center;cursor:pointer}
+        #nb{position:absolute;top:-4px;right:-4px;background:#E53935;color:#fff;border-radius:10px;font-size:.6rem;padding:1px 5px}
+        textarea.form-input{min-height:70px;font-family:inherit}
         #sos{position:fixed;bottom:78px;left:14px;width:46px;height:46px;border-radius:50%;background:#E53935;color:#fff;display:none;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 10px rgba(0,0,0,.3);cursor:pointer}
     </style>
 </head>
@@ -867,6 +872,7 @@
                 <input type="tel" class="form-input" placeholder="رقم الهاتف (اختياري)" id="signupPhone" />
                 <input type="password" class="form-input" placeholder="كلمة المرور" id="signupPass" />
                 <input type="password" class="form-input" placeholder="تأكيد كلمة المرور" id="signupConfirm" />
+                <label class="radio-item" style="margin:8px 0;font-size:.8rem"><input type="checkbox" id="consent"> أوافق على معالجة بياناتي الصحية لتقديم الخدمة، ولا تُتاح إلا للمختصين المخولين</label>
                 <button class="btn-login" onclick="doSignup()">إنشاء حساب</button>
                 <div class="signup-link">لديك حساب؟ <a onclick="goTo('login')">تسجيل الدخول</a></div>
             </div>
@@ -875,6 +881,7 @@
         <!-- ===== HOME ===== -->
         <div class="screen" id="home">
             <div class="header-home">
+                <div id="bell" onclick="notif()"><i class="fas fa-bell"></i><span id="nb"></span></div>
                 <div class="header-logo"><img src="logo.png" alt="لَكِ" /></div>
                 <div class="header-text">
                     <div class="header-name" data-t="hi">مرحباً بكِ!</div>
@@ -1006,7 +1013,7 @@
         <div class="screen" id="records">
             <div class="detail-header">
                 <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
-                <div class="detail-title">الملف الصحي</div>
+                <div class="detail-title">حسابي</div>
             </div>
             <div class="detail-content" id="recBody"></div>
         </div>
@@ -1117,16 +1124,23 @@
             <div class="detail-header"><div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div><div class="detail-title">صحتي النفسية</div></div>
             <div class="detail-content" id="moodBody"></div>
         </div>
+        <div class="screen" id="pg">
+            <div class="detail-header"><div class="back-btn" id="pgBack"><i class="fas fa-arrow-right"></i></div><div class="detail-title" id="pgT"></div></div>
+            <div class="detail-content" id="pgBody"></div>
+        </div>
+        <div class="screen" id="msgs">
+            <div class="detail-header"><div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div><div class="detail-title">الرسائل والتواصل</div></div>
+            <div class="detail-content" id="msgBody"></div>
+        </div>
         <div id="sos" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i></div>
 
         <!-- ===== BOTTOM NAV ===== -->
         <div class="bottom-nav" id="bottomNav">
-            <button class="nav-item active" onclick="goTo('home')"><i class="fas fa-home"></i> <span data-t="n1">لرئيسية</span></button>
-            <button class="nav-item" onclick="goTo('pregnancy')"><i class="fas fa-chart-line"></i> <span data-t="n2">لمتابعة</span></button>
-            <button class="nav-item" onclick="goTo('records')"><i class="fas fa-folder"></i> <span data-t="n3">لملف</span></button>
-            <button class="nav-item" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i> <span data-t="n4">لطوارئ</span></button>
+            <button class="nav-item active" onclick="goTo('home')"><i class="fas fa-home"></i> <span data-t="n1">الرئيسية</span></button>
+            <button class="nav-item" onclick="goTo('appointments')"><i class="fas fa-calendar-check"></i> <span data-t="n2">المواعيد</span></button>
+            <button class="nav-item" onclick="goTo('msgs')"><i class="fas fa-comments"></i> <span data-t="n3">الرسائل</span></button>
+            <button class="nav-item" onclick="goTo('records')"><i class="fas fa-user"></i> <span data-t="n4">حسابي</span></button>
         </div>
-
         <!-- ===== MODAL ===== -->
         <div class="modal" id="modal">
             <div class="modal-content">
@@ -1162,7 +1176,7 @@
             if (target) target.classList.add('active');
 
             const nav = document.getElementById('bottomNav');
-            const mainScreens = ['home', 'pregnancy', 'records', 'emergency'];
+            const mainScreens = ['home', 'appointments', 'msgs', 'records'];
             nav.style.display = mainScreens.includes(screen) ? 'flex' : 'none';
 
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1252,9 +1266,9 @@
         const fm = d => d.toLocaleDateString({ ar: 'ar-DZ', en: 'en-GB', fr: 'fr-FR' }[S.lang || 'ar'], { day: 'numeric', month: 'long', year: 'numeric' });
 
         const T = {
-            ar: { start: 'ابدئي الآن', hi: 'مرحباً بكِ', c1: 'متابعة الحمل', c2: 'حجز موعد', c3: 'استشارة نفسية', c4: 'نصائح يومية', c5: 'ما بعد الولادة', c6: 'الطوارئ', c7: 'الأدوات', c8: 'المدونات', n1: 'الرئيسية', n2: 'المتابعة', n3: 'الملف', n4: 'الطوارئ' },
-            en: { start: 'Get started', hi: 'Welcome', c1: 'Pregnancy tracker', c2: 'Book appointment', c3: 'Mental health', c4: 'Daily tips', c5: 'Postpartum', c6: 'Emergency', c7: 'Tools', c8: 'Blog', n1: 'Home', n2: 'Tracker', n3: 'Records', n4: 'Emergency' },
-            fr: { start: 'Commencer', hi: 'Bienvenue', c1: 'Suivi de grossesse', c2: 'Prendre rendez-vous', c3: 'Santé mentale', c4: 'Conseils du jour', c5: 'Post-partum', c6: 'Urgences', c7: 'Outils', c8: 'Blog', n1: 'Accueil', n2: 'Suivi', n3: 'Dossier', n4: 'Urgences' }
+            ar: { start: 'ابدئي الآن', hi: 'مرحباً بكِ', c1: 'متابعة الحمل', c2: 'حجز موعد', c3: 'استشارة نفسية', c4: 'نصائح يومية', c5: 'ما بعد الولادة', c6: 'الطوارئ', c7: 'الأدوات', c8: 'المدونات', n1: 'الرئيسية', n2: 'المواعيد', n3: 'الرسائل', n4: 'حسابي' },
+            en: { start: 'Get started', hi: 'Welcome', c1: 'Pregnancy tracker', c2: 'Book appointment', c3: 'Mental health', c4: 'Daily tips', c5: 'Postpartum', c6: 'Emergency', c7: 'Tools', c8: 'Blog', n1: 'Home', n2: 'Appointments', n3: 'Messages', n4: 'Account' },
+            fr: { start: 'Commencer', hi: 'Bienvenue', c1: 'Suivi de grossesse', c2: 'Prendre rendez-vous', c3: 'Santé mentale', c4: 'Conseils du jour', c5: 'Post-partum', c6: 'Urgences', c7: 'Outils', c8: 'Blog', n1: 'Accueil', n2: 'Rendez-vous', n3: 'Messages', n4: 'Compte' }
         };
         function applyLang() {
             const l = S.lang || 'ar', d = l === 'ar' ? 'rtl' : 'ltr';
@@ -1462,6 +1476,7 @@
             const g = id => $(id).value.trim(), m = t => showModal('تنبيه', t);
             const name = g('fullname'), email = g('signupEmail').toLowerCase(), pass = nz($('signupPass').value);
             if (!name || !email || !pass) return m('أدخلي الاسم والبريد وكلمة المرور');
+            if (!$('consent').checked) return m('يلزم الموافقة على معالجة بياناتك لإنشاء الحساب');
             if (pass.length < 6) return m('كلمة المرور 6 أحرف على الأقل');
             if (pass !== nz($('signupConfirm').value)) return m('كلمتا المرور غير متطابقتين');
             ST('acc', { name, email, pass, age: g('signupAge'), phone: g('signupPhone') });
@@ -1553,8 +1568,92 @@
         function apDel(i) { const a = ST('appts') || []; a.splice(i, 1); ST('appts', a); renderAp(); }
 
         H.home = renderHome; H.mood = renderMood; H.appointments = renderAp;
-        applyLang();
-    </script>
 
-</body>
-</html>
+        // ===== v5: owner requirements (sections, specialists, booking, chat, library, account, admin) =====
+        const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const nmL = (L, k) => (L.find(x => x[0] === k) || [])[1];
+        const tglA = (key, id, fn) => { let a = ST(key) || []; a = a.includes(id) ? a.filter(x => x !== id) : [...a, id]; ST(key, a); fn(); };
+        function pg(t, back, h) { $('pgT').textContent = t; $('pgBack').setAttribute('onclick', back || "goTo('home')"); $('pgBody').innerHTML = h; goTo('pg'); $('pgBody').scrollTop = 0; }
+
+        const SPD = {
+            gyn: { n: 'د. أمينة بن عيسى', r: 'طبيبة أمراض النساء والتوليد', e: '👩‍⚕️', b: 'متابعة الحمل والولادة والحالات الخاصة كسكري الحمل وارتفاع الضغط وفقر الدم.', s: ['متابعة الحمل', 'الفحوصات', 'حمل عالي الخطورة'], h: ['09:00', '10:30', '14:00', '15:30'] },
+            mid: { n: 'فاطمة مراد', r: 'قابلة مؤهلة', e: '🤱', b: 'مرافقة الحمل والتحضير للولادة ودعم الرضاعة الطبيعية.', s: ['التحضير للولادة', 'الرضاعة', 'متابعة النفاس'], h: ['09:30', '11:00', '14:30'] },
+            psy: { n: 'ليلى حداد', r: 'أخصائية نفسية', e: '🧠', b: 'دعم القلق والتوتر والاكتئاب المرتبط بالحمل والأمومة، حضورياً أو عن بُعد.', s: ['القلق والتوتر', 'ما بعد الولادة', 'الاسترخاء'], h: ['10:00', '11:30', '15:00', '16:30'] },
+            nut: { n: 'كريم بوزيد', r: 'أخصائي تغذية', e: '🥗', b: 'برامج غذائية لكل مرحلة، وسكري الحمل وفقر الدم والرضاعة.', s: ['تغذية الحامل', 'سكري الحمل', 'تغذية المرضعة'], h: ['09:00', '11:00', '14:00'] },
+            fit: { n: 'سلمى عمراني', r: 'مختصة النشاط البدني والتأهيل بعد الولادة', e: '🧘‍♀️', b: 'تمارين آمنة للحامل واستعادة اللياقة تدريجياً بعد الولادة.', s: ['تمارين الحمل', 'قاع الحوض', 'التأهيل'], h: ['08:30', '10:00', '16:00'] },
+            ped: { n: 'د. ياسين قاسمي', r: 'طبيب أطفال', e: '👶', b: 'متابعة نمو الرضيع والتلقيحات والعلامات التي تستدعي المراجعة.', s: ['نمو الطفل', 'التلقيحات', 'العناية بالمولود'], h: ['09:00', '10:30', '14:00'] }
+        };
+        const SEC = {
+            plan: { t: 'التخطيط للحمل', i: 'fa-seedling', items: ['استشارات ما قبل الحمل', 'التوجيه الصحي والنفسي للاستعداد للحمل', 'الإرشاد التغذوي والاستعداد الجسدي', 'حجز موعد مع المختصين'], sp: ['gyn', 'nut', 'psy'], l: [['تتبع الدورة والخصوبة', "goTo(S.mode==='cycle'?'pregnancy':'onb')"], ['حجز استشارة ما قبل الحمل', "doc('gyn')"], ['مقالات للاستعداد للحمل', "lib('art')"]] },
+            prep: { t: 'التحضير للولادة', i: 'fa-person-pregnant', items: ['دورات التحضير النفسي والجسدي للولادة', 'تمارين التنفس والاسترخاء', 'تمارين مناسبة للحامل تحت إشراف مختص', 'التوعية بمراحل الولادة', 'فيديوهات تعليمية للتحضير للولادة'], sp: ['mid', 'fit', 'psy'], l: [['تمرين التنفس', "openTool('breath')"], ['علامات المخاض والولادة', "openTool('labor')"], ['مؤقت الانقباض', "openTool('contr')"], ['حقيبة المستشفى', "openTool('bag')"], ['فيديوهات التحضير', "lib('vid')"], ['الدورات والورشات', "lib('crs')"]] },
+            mind: { t: 'الصحة النفسية', i: 'fa-heart', items: ['حجز جلسات مع أخصائية نفسية', 'استشارات نفسية عن بُعد', 'متابعة القلق والتوتر والاكتئاب المرتبط بالحمل والأمومة', 'برامج الاسترخاء وإدارة الضغط', 'التوعية باكتئاب ما بعد الولادة وذهان النفاس', 'التوجيه إلى الجهات الصحية المختصة عند الأعراض الخطيرة'], w: 'هلوسات أو ارتباك شديد أو أفكار بإيذاء النفس أو الطفل أو العجز عن رعاية النفس والطفل: توجهي إلى الطوارئ فوراً ولا تبقي وحدك.', sp: ['psy'], l: [['فحص المزاج والقلق', "goTo('mood')"], ['تمرين التنفس والاسترخاء', "openTool('breath')"], ['تسجيل المزاج والأعراض', "openTool('sym')"], ['استشارة نفسية عن بُعد', "doc('psy')"]] },
+            nutr: { t: 'التغذية الصحية', i: 'fa-apple-whole', items: ['حجز استشارات مع أخصائي التغذية', 'إرشادات غذائية لكل مرحلة من الحمل', 'التغذية في سكري الحمل وفقر الدم', 'التغذية المناسبة خلال الرضاعة الطبيعية', 'الإرشادات الغذائية بعد الولادة'], sp: ['nut'], l: [['خطة الوجبات', "openTool('meal')"], ['تتبع الوزن', "openTool('weight')"], ['استشارة تغذية', "doc('nut')"]] },
+            recov: { t: 'التعافي بعد الولادة', i: 'fa-hand-holding-heart', items: ['متابعة التعافي الجسدي بعد الولادة', 'استعادة اللياقة البدنية تدريجياً وبأمان', 'تمارين مناسبة تحت إشراف مختص', 'إرشادات الراحة والنوم', 'المتابعة النفسية للأم بعد الولادة'], w: 'نزيف غزير، حمى، ألم شديد، أو احمرار وإفرازات من الجرح: راجعي الطبيبة فوراً.', sp: ['fit', 'gyn', 'psy'], l: [['تمرين كيجل', "openTool('kegel')"], ['فحص المزاج', "goTo('mood')"], ['حجز فحص ما بعد الولادة', "doc('gyn')"], ['برنامج التأهيل', "doc('fit')"]] },
+            baby: { t: 'الرضاعة والعناية بالمولود', i: 'fa-baby-carriage', items: ['إرشادات الرضاعة الطبيعية', 'المساعدة في صعوبات الرضاعة', 'استشارة مختصة بالرضاعة', 'العناية اليومية بالمولود واحتياجاته الأساسية', 'العلامات التي تستدعي استشارة طبيب الأطفال'], w: 'صعوبة في التنفس، حمى عند الرضيع، أو رفض الرضاعة بشكل مستمر: توجهي للطوارئ أو لطبيب الأطفال فوراً.', sp: ['ped', 'mid'], l: [['استشارة رضاعة', "doc('mid')"], ['استشارة طبيب الأطفال', "doc('ped')"], ['فيديوهات العناية بالمولود', "lib('vid')"]] }
+        };
+        const STG_SEC = { plan: 'plan', preg: 'preg', birth: 'prep', post: 'recov' };
+        const HSEC = [['plan', 'fa-seedling', 'التخطيط للحمل'], ['preg', 'fa-baby', 'متابعة الحمل'], ['prep', 'fa-person-pregnant', 'التحضير للولادة'], ['mind', 'fa-heart', 'الصحة النفسية'], ['nutr', 'fa-apple-whole', 'التغذية الصحية'], ['recov', 'fa-hand-holding-heart', 'التعافي بعد الولادة'], ['baby', 'fa-baby-carriage', 'الرضاعة والعناية بالمولود'], ['edu', 'fa-book-open', 'التوعية والتثقيف']];
+        function renderHome() {
+            const rec = STG_SEC[stg()];
+            $('homeGrid').innerHTML = HSEC.map(([k, i, l], j) => `<div class="card-home card-${j % 6 + 1}" style="${k === rec ? 'outline:3px solid #D37586' : ''}" onclick="${k === 'preg' ? "goTo('pregnancy')" : k === 'edu' ? "lib('art')" : "sec('" + k + "')"}"><i class="fas ${i}"></i> <span>${l}</span></div>`).join('') +
+                `<div class="card" style="grid-column:1/-1"><button class="btn-sec" onclick="docs()">👩‍⚕️ تعرّفي على مختصينا</button><div class="card-text" style="text-align:center;font-size:.75rem;margin-top:6px">لَكِ... لأن بناء المجتمع يبدأ برعاية الأم والطفل.</div></div>`;
+            const n = nlist().length; $('nb').textContent = n || ''; $('nb').style.display = n ? 'block' : 'none';
+        }
+        function sec(k) {
+            const s = SEC[k];
+            pg(s.t, "goTo('home')", `<div class="card"><div class="card-title"><i class="fas ${s.i}"></i> خدمات القسم</div>${s.items.map(x => `<div class="row"><span>• ${x}</span></div>`).join('')}</div>
+            ${s.w ? `<div class="card" style="border:2px solid #E53935"><div class="card-title" style="color:#E53935">⚠️ متى تطلبين مساعدة عاجلة</div><div class="card-text">${s.w}</div></div>` : ''}
+            <div class="card"><div class="card-title">أدوات وروابط</div>${s.l.map(([t, a]) => `<button class="btn-sec" onclick="${a}">${t}</button>`).join('')}</div>
+            <div class="card"><div class="card-title">المختصون</div>${s.sp.map(x => `<div class="row" style="cursor:pointer" onclick="doc('${x}')"><span>${SPD[x].e} ${SPD[x].n}</span><span>${SPD[x].r}</span></div>`).join('')}</div>`);
+        }
+
+        // ----- specialists & booking -----
+        function docs() {
+            pg('المختصون', "goTo('appointments')", Object.entries(SPD).map(([k, d]) => `<div class="card"><div style="display:flex;gap:10px;align-items:center"><div class="av">${d.e}</div><div><div class="card-title" style="margin:0">${d.n}</div><div class="card-text">${d.r}</div></div></div><div class="card-text">${d.b}</div><button class="btn-primary" onclick="doc('${k}')">المواعيد والحجز</button></div>`).join('') + '<div class="card-text" style="font-size:.7rem">الأسماء والصور تجريبية وتُستبدل ببيانات المختصين الفعليين.</div>');
+        }
+        let BK = {};
+        function slots(k) {
+            const taken = (ST('appts') || []).filter(a => a.sp === k && a.st !== 'x').map(a => a.ad + a.at), out = [];
+            if ((ST('spoff') || []).includes(k)) return out;
+            for (let i = 1; out.length < 5 && i < 21; i++) {
+                const d = new Date(+td() + i * D); if ([5, 6].includes(d.getDay())) continue;
+                const iso = isoD(d); out.push({ iso, times: SPD[k].h.filter(t => !taken.includes(iso + t)) });
+            }
+            return out;
+        }
+        function doc(k) { if (BK.sp !== k) BK = { sp: k, ty: 'onsite' }; drawDoc(); }
+        function drawDoc() {
+            const k = BK.sp, d = SPD[k], sl = slots(k), day = sl.find(x => x.iso === BK.ad);
+            pg(d.n, 'docs()', `<div class="card text-center"><div class="av" style="margin:auto;width:80px;height:80px;font-size:2.6rem">${d.e}</div><div class="card-title" style="justify-content:center">${d.n}</div><div class="card-text">${d.r}</div><div class="card-text">${d.b}</div><div class="chips" style="justify-content:center">${d.s.map(x => `<span class="chip">${x}</span>`).join('')}</div></div>
+            <div class="card"><div class="card-title">نوع الموعد</div><div class="chips">${TY.map(([a, l]) => `<span class="chip ${BK.ty === a ? 'on' : ''}" onclick="BK.ty='${a}';drawDoc()">${l}</span>`).join('')}</div>
+            <div class="card-title">اليوم</div><div class="chips">${sl.map(x => `<span class="chip ${BK.ad === x.iso ? 'on' : ''}" onclick="BK.ad='${x.iso}';BK.at='';drawDoc()">${new Date(x.iso + 'T00:00').toLocaleDateString('ar-DZ', { weekday: 'short', day: 'numeric', month: 'short' })}</span>`).join('') || '<div class="card-text">لا مواعيد متاحة حالياً</div>'}</div>
+            ${day ? `<div class="card-title">الساعة</div><div class="chips">${day.times.map(t => `<span class="chip ${BK.at === t ? 'on' : ''}" onclick="BK.at='${t}';drawDoc()">${t}</span>`).join('') || '<div class="card-text">محجوز بالكامل</div>'}</div>` : ''}
+            <button class="btn-primary" onclick="book()">تأكيد الحجز</button><button class="btn-sec" onclick="chat('${k}')">💬 راسلي المختص</button></div>`);
+        }
+        function book() {
+            if (!BK.ad || !BK.at) return showModal('تنبيه', 'اختاري اليوم والساعة');
+            const a = ST('appts') || []; a.push({ sp: BK.sp, ty: BK.ty, ad: BK.ad, at: BK.at, st: 'p' }); ST('appts', a); BK = {};
+            goTo('appointments'); showModal('تم', 'تم إرسال طلب الحجز ✓ سيصلكِ تأكيد من العيادة');
+        }
+        function renderAp() {
+            const a = ST('appts') || [], t = isoD(td()), up = [], past = [];
+            a.forEach((x, i) => ((x.ad >= t && x.st !== 'x') ? up : past).push([x, i]));
+            const card = ([x, i], isUp) => `<div class="card"><div class="card-title">${SPD[x.sp].n}</div><div class="card-text">${SPD[x.sp].r} • ${nmL(TY, x.ty)}<br>${x.ad} • ${x.at} • ${x.st === 'x' ? 'ملغى' : x.st === 'ok' ? '✅ مؤكد' : isUp ? '⏳ بانتظار التأكيد' : 'منتهٍ'}</div>
+                ${isUp ? `${x.ty !== 'onsite' ? `<button class="btn-primary" onclick="startC(${i})">بدء الاستشارة</button>` : ''}<button class="btn-sec" onclick="apDel(${i})">إلغاء الموعد</button>` : x.st !== 'x' && !x.r ? `<button class="btn-sec" onclick="rate(${i})">⭐ تقييم الخدمة</button>` : x.r ? `<div class="card-text">تقييمك: ${'⭐'.repeat(x.r)}</div>` : ''}</div>`;
+            $('apBody').innerHTML = `<button class="btn-primary" onclick="docs()">+ حجز موعد جديد</button><div class="card-title" style="margin-top:12px">المواعيد القادمة</div>${up.map(x => card(x, true)).join('') || '<div class="card-text">لا مواعيد قادمة</div>'}<div class="card-title" style="margin-top:12px">سجل المواعيد والاستشارات السابقة</div>${past.map(x => card(x, false)).join('') || '<div class="card-text">لا سجل بعد</div>'}`;
+        }
+        function apDel(i) { const a = ST('appts') || []; a[i].st = 'x'; ST('appts', a); renderAp(); }
+        function startC(i) { const x = (ST('appts') || [])[i]; if (x.ty === 'chat') chat(x.sp); else if (x.ty === 'video') goTo('videocall'); else showModal('استشارة صوتية', 'ستتصل بكِ العيادة هاتفياً في الموعد المحدد.'); }
+        let rt = 0;
+        function rate(i) { rt = 0; pg('تقييم الخدمة', "goTo('appointments')", `<div class="card"><div class="chips" id="stars">${[1, 2, 3, 4, 5].map(n => `<span class="chip" onclick="rt=${n};document.querySelectorAll('#stars .chip').forEach((c,j)=>c.classList.toggle('on',j<${n}))">⭐ ${n}</span>`).join('')}</div><textarea id="rc" class="form-input" placeholder="ملاحظاتك (اختياري)"></textarea><button class="btn-primary" onclick="saveRate(${i})">إرسال</button></div>`); }
+        function saveRate(i) { if (!rt) return showModal('تنبيه', 'اختاري عدد النجوم'); const a = ST('appts') || []; a[i].r = rt; ST('appts', a); const f = ST('fb') || []; f.push({ d: new Date().toLocaleDateString(), k: 'تقييم', r: rt, t: $('rc').value.trim(), sp: a[i].sp }); ST('fb', f); goTo('appointments'); showModal('شكراً', 'تم إرسال تقييمك ✓'); }
+
+        // ----- messages & chat -----
+        function addMsg(k, f, t) { const c = ST('chat') || {}; (c[k] = c[k] || []).push({ f, t, ts: Date.now() }); ST('chat', c); if ($('cm') && $('cm').dataset.k === k) { $('cm').insertAdjacentHTML('beforeend', bub({ f, t })); } }
+        const bub = x => `<div style="display:flex;justify-content:${x.f === 'me' ? 'flex-start' : 'flex-end'};margin:4px 0"><div style="max-width:80%;padding:8px 12px;border-radius:14px;font-size:.8rem;background:${x.f === 'me' ? '#D37586' : '#F5E1E4'};color:${x.f === 'me' ? '#fff' : '#333'}">${esc(x.t)}</div></div>`;
+        function chat(k) {
+            const m = (ST('chat') || {})[k] || [];
+            pg(k === 'clinic' ? 'العيادة' : SPD[k].n, "goTo('msgs')", `<div class="card-text" style="font-size:.7rem">🔒 المحادثة سرية بين المستفيدة والمختص. للحالات العاجلة استخدمي زر الطوارئ.</div><div id="cm" data-k="${k}">${m.map(bub).join('')}</div><input id="ci" class="form-input" placeholder="اكتبي رسالتك"><button class="btn-primary" onclick="send('${k}')">إرسال</button><label class="btn-sec" style="display:block;text-align:center">📎 إرسال تقرير أو تحليل<input type="file" hidden onchange="sendF('${k}',this)"></label>`);
+        }
+        function send(k) { const v = $('ci').value.trim(); if (!v) return; const first = !((ST('chat') || {})[k] || []).length; addMsg(k, 'me', v); $('ci').value = ''; if (first) setTimeout(() => addMsg(k, 'them', k === 'clinic' ? 'تم استلام استفسارك، وسيتواصل معكِ فريق العيادة قريباً.' : 'شكراً لرسالتك، سيرد عليكِ المختص خلال 24 ساعة.'), 1200); }
+        function sendF(k, el) { const 
