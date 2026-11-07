@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#F5E1E4" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>لَكِ - تطبيق الأمومة</title>
+
+    <!-- PWA: manifest link to external file -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="logo.png" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* ===== RESET & FULLSCREEN ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            background: #ffffff;
+            direction: rtl;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== SCREENS ===== */
+        .screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #ffffff;
+            z-index: 1;
+        }
+        .screen.active {
+            display: flex;
+            z-index: 2;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== SPLASH ===== */
+        #splash {
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            background: #FDE2D3;
+            background-image: url('1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            padding-top: 20vh;
+        }
+        #splash::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #FDE2D3 0%, #F5E1E4 100%);
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #splash.no-image::before {
+            opacity: 1;
+        }
+        #splash>* {
+            position: relative;
+            z-index: 2;
+        }
+        .btn-splash {
+            background: rgba(211, 117, 134, 0.95);
+            color: #fff;
+            border: none;
+            padding: 18px 64px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(2px);
+            margin-top: 60px;
+            margin-bottom: 40px;
+            animation: glow-pulse 2.5s infinite ease-in-out;
+            transition: transform 0.15s;
+            will-change: transform, box-shadow;
+        }
+        .btn-splash:active {
+            transform: scale(0.94);
+        }
+        @keyframes glow-pulse {
+            0% {
+                box-shadow: 0 0 15px rgba(211, 117, 134, 0.4), 0 0 30px rgba(211, 117, 134, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(211, 117, 134, 0.9), 0 0 60px rgba(211, 117, 134, 0.5), 0 0 100px rgba(211, 117, 134, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(211, 117, 134, 0.4), 0 0 30px rgba(211, 117, 134, 0.2);
+            }
+        }
+
+        /* ===== LOGIN & SIGNUP ===== */
+        #login,
+        #signup {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #FDE2D3 0%, #F5E1E4 100%);
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 30px 20px 28px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 12px 40px rgba(211, 117, 134, 0.15);
+            text-align: center;
+        }
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 12px;
+            border-radius: 20px;
+            background: #fff;
+            padding: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .login-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-top: 4px;
+        }
+        .login-desc {
+            color: #8FA89B;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #F5E1E4;
+            border-radius: 12px;
+            font-family: 'Cairo';
+            margin-bottom: 14px;
+            outline: none;
+            transition: border 0.2s;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+        .form-input:focus {
+            border-color: #D37586;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #D37586;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+        }
+        .btn-login:active {
+            transform: scale(0.96);
+        }
+        .signup-link {
+            text-align: center;
+            color: #8FA89B;
+            font-size: 0.8rem;
+            margin-top: 14px;
+        }
+        .signup-link a {
+            color: #D37586;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ===== HEADER ===== */
+        .detail-header,
+        .header-home {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(135deg, #F5E1E4 0%, #FDE2D3 100%);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 2px 12px rgba(211, 117, 134, 0.08);
+            min-height: 64px;
+        }
+        .header-home .header-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+        .header-home .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .header-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .header-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        .header-subtext {
+            font-size: 0.75rem;
+            color: #8FA89B;
+        }
+        .back-btn {
+            font-size: 1.3rem;
+            color: #D37586;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: transform 0.15s, background 0.2s;
+            will-change: transform;
+            flex-shrink: 0;
+        }
+        .back-btn:active {
+            transform: scale(0.85);
+        }
+        .detail-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #videocall .detail-header {
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            border-radius: 0;
+            box-shadow: none;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+        }
+        #videocall .detail-title {
+            color: #fff;
+        }
+        #videocall .back-btn {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== CONTENT ===== */
+        .detail-content {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px 16px 20px;
+            background: #FFFDFB;
+            min-height: 0;
+        }
+        .detail-content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .detail-content::-webkit-scrollbar-thumb {
+            background: #D37586;
+            border-radius: 10px;
+        }
+
+        /* ===== HOME GRID ===== */
+        #home {
+            background: #FFFDFB;
+        }
+        #home .header-home {
+            border-radius: 0 0 20px 20px;
+        }
+        .grid-cards {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px 16px 20px;
+            align-content: start;
+            overflow-y: auto;
+        }
+        .card-home {
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.12s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            font-family: 'Cairo';
+            gap: 6px;
+            will-change: transform;
+        }
+        .card-home i {
+            font-size: 2.2rem;
+        }
+        .card-home:active {
+            transform: scale(0.94);
+        }
+        .card-1 {
+            background: linear-gradient(135deg, #F5E1E4 0%, #FDE0DC 100%);
+            color: #D37586;
+        }
+        .card-2 {
+            background: linear-gradient(135deg, #E3EBE6 0%, #D5E3D8 100%);
+            color: #7A9B8A;
+        }
+        .card-3 {
+            background: linear-gradient(135deg, #FDE2D3 0%, #FDD5C0 100%);
+            color: #D37586;
+        }
+        .card-4 {
+            background: linear-gradient(135deg, #F0E6F6 0%, #E8D9EF 100%);
+            color: #A67FB5;
+        }
+        .card-5 {
+            background: linear-gradient(135deg, #E0F0EA 0%, #D2E8E0 100%);
+            color: #6A9B85;
+        }
+        .card-6 {
+            background: linear-gradient(135deg, #FDE0DD 0%, #FDD3CF 100%);
+            color: #D37586;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin: 8px 0;
+            border: 1px solid #F5E1E4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        .card-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .card-title i {
+            color: #D37586;
+            width: 1.4rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .card-text {
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* ===== PREGNANCY TRACKER ===== */
+        .progress-ring {
+            width: 100px;
+            height: 100px;
+            margin: 6px auto 8px;
+            border-radius: 50%;
+            background: conic-gradient(#D37586 60%, #F5E1E4 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .progress-inner {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .week-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #D37586;
+            line-height: 1;
+        }
+        .week-text {
+            font-size: 0.7rem;
+            color: #8FA89B;
+        }
+        .pregnancy-progress-bar {
+            background: #F5E1E4;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .pregnancy-progress-bar div {
+            width: 60%;
+            height: 100%;
+            background: #D37586;
+            border-radius: 8px;
+        }
+
+        /* ===== APPOINTMENTS ===== */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 6px 0 4px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid #F5E1E4;
+            transition: border 0.2s, background 0.2s;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #333;
+            gap: 8px;
+        }
+        .radio-item:has(input:checked) {
+            border-color: #D37586;
+            background: #FDF2F4;
+        }
+        .radio-item input {
+            accent-color: #D37586;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin: 6px 0 4px;
+        }
+        .date-btn {
+            padding: 6px 0;
+            background: #F5E1E4;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+            font-family: 'Cairo';
+            font-size: 0.8rem;
+            will-change: transform;
+        }
+        .date-btn:active {
+            transform: scale(0.9);
+        }
+        .date-btn.active {
+            background: #D37586;
+            color: #fff;
+        }
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin: 6px 0 4px;
+        }
+        .time-btn {
+            padding: 8px;
+            background: #fff;
+            border: 2px solid #F5E1E4;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s, border 0.2s, transform 0.1s;
+            font-family: 'Cairo';
+            color: #333;
+            font-size: 0.8rem;
+            will-change: transform;
+        }
+        .time-btn:active {
+            transform: scale(0.93);
+        }
+        .time-btn.active {
+            background: #D37586;
+            color: #fff;
+            border-color: #D37586;
+        }
+
+        /* ===== VIDEO CALL ===== */
+        #videocall {
+            background: #000;
+            position: relative;
+        }
+        #videocall .doctor-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            z-index: 0;
+        }
+        #videocall .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 1;
+        }
+        #videocall .selfie-window {
+            position: absolute;
+            bottom: 120px;
+            right: 20px;
+            width: 110px;
+            height: 150px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            background: url('https://randomuser.me/api/portraits/women/79.jpg') center/cover no-repeat;
+            z-index: 5;
+        }
+        #videocall .selfie-window .selfie-label {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        #videocall .video-controls-full {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 0 20px;
+        }
+        .control-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .control-btn:active {
+            transform: scale(0.88);
+        }
+        .control-btn.end {
+            background: #E53935;
+            color: #fff;
+        }
+        .control-btn.muted {
+            background: rgba(229, 57, 53, 0.6) !important;
+        }
+        .control-btn.cam-off {
+            background: rgba(229, 57, 53, 0.6) !important;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #D37586;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            font-family: 'Cairo';
+            margin: 10px 0 4px;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-emergency {
+            width: 100%;
+            padding: 14px;
+            background: #E53935;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            will-change: transform;
+            font-family: 'Cairo';
+            margin: 8px 0 6px;
+        }
+        .btn-emergency:active {
+            transform: scale(0.97);
+        }
+        .emergency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 8px 0;
+        }
+        .emergency-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s;
+            border: 1px solid #F5E1E4;
+            will-change: transform;
+        }
+        .emergency-card:active {
+            transform: scale(0.95);
+        }
+        .emergency-icon {
+            font-size: 1.8rem;
+            color: #D37586;
+            margin-bottom: 4px;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid #F5E1E4;
+            display: none;
+            justify-content: space-around;
+            padding: 4px 0 12px;
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            cursor: pointer;
+            color: #999;
+            font-size: 0.55rem;
+            font-weight: 600;
+            transition: color 0.2s;
+            padding: 2px 0;
+            border: none;
+            background: transparent;
+            font-family: 'Cairo';
+        }
+        .nav-item i {
+            font-size: 1.3rem;
+        }
+        .nav-item.active {
+            color: #D37586;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            max-width: 270px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .modal-text {
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        .modal-btn {
+            background: #D37586;
+            color: #fff;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: transform 0.15s;
+            font-family: 'Cairo';
+        }
+        .modal-btn:active {
+            transform: scale(0.95);
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        /* ===== v2 additions ===== */
+        #lang{justify-content:center;align-items:center;padding:20px;background:linear-gradient(135deg,#FDE2D3 0%,#F5E1E4 100%)}
+        .opt{padding:12px;border:2px solid #F5E1E4;border-radius:12px;margin:8px 0;cursor:pointer;font-weight:600;color:#333;font-size:.9rem;background:#fff}
+        .opt.on,.chip.on{border-color:#D37586;background:#FDF2F4;color:#D37586}
+        .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+        .chip{padding:7px 12px;border:2px solid #F5E1E4;border-radius:20px;font-size:.8rem;cursor:pointer;background:#fff;color:#555}
+        .big{font-size:3rem;font-weight:700;color:#D37586}
+        .btn-sec{width:100%;padding:10px;background:#fff;border:2px solid #D37586;color:#D37586;border-radius:14px;font-family:Cairo;font-weight:700;margin:4px 0;cursor:pointer}
+        .row{display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px solid #F5E1E4;font-size:.8rem;color:#555}
+        .wgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:6px 0}
+        .wc{font-size:.6rem;text-align:center;padding:4px 0;border-radius:5px;background:#F5E1E4;color:#999}
+        .wc.p{background:#D37586;color:#fff}
+        .wc.n{outline:2px solid #333;background:#fff;color:#333;font-weight:700}
+        .tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+        .tgrid .card-home{min-height:84px;font-size:.72rem;background:#FDF2F4;color:#D37586;padding:10px 4px}
+        .tgrid .card-home i{font-size:1.6rem}
+        .rng{width:100%;accent-color:#D37586}
+        .lbl{font-size:.8rem;color:#555;margin:6px 0 4px}
+        .stepbar{height:5px;background:#F5E1E4;border-radius:5px;margin-bottom:10px}
+        .stepbar div{height:100%;background:#D37586;border-radius:5px;transition:width .3s}
+        [dir=ltr] .back-btn i{transform:scaleX(-1)}
+        .detail-content{padding-bottom:70px}
+        .av{width:56px;height:56px;border-radius:50%;background:#FDF2F4;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+        .header-home{position:relative}
+        #bell{position:absolute;top:16px;left:16px;width:36px;height:36px;border-radius:50%;background:#fff;color:#D37586;display:flex;align-items:center;justify-content:center;cursor:pointer}
+        #nb{position:absolute;top:-4px;right:-4px;background:#E53935;color:#fff;border-radius:10px;font-size:.6rem;padding:1px 5px}
+        textarea.form-input{min-height:70px;font-family:inherit}
+        #sos{position:fixed;bottom:78px;left:14px;width:46px;height:46px;border-radius:50%;background:#E53935;color:#fff;display:none;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 10px rgba(0,0,0,.3);cursor:pointer}
+
+        /* ===== v6 mobile ===== */
+        html{-webkit-text-size-adjust:100%}
+        body{-webkit-tap-highlight-color:transparent;overscroll-behavior:none;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+        input,textarea,select{user-select:text;-webkit-user-select:text;font-size:16px !important}
+        @supports(height:100dvh){html,body,.app,.screen{height:100dvh}}
+        .screen{padding-top:env(safe-area-inset-top,0px)}
+        .bottom-nav{height:auto !important;min-height:60px;padding-bottom:env(safe-area-inset-bottom,0px)}
+        .nav-item{font-size:.68rem !important;min-height:52px;justify-content:center}
+        .nav-item i{font-size:1.15rem}
+        .btn-primary,.btn-sec,.btn-login{min-height:48px}
+        .chip{padding:10px 14px;font-size:.85rem}.opt{padding:14px}
+        .detail-content{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+        #sos{bottom:calc(78px + env(safe-area-inset-bottom,0px));width:48px;height:48px}
+        .av img{display:block}
+        @media(min-width:561px){html{background:#F5E1E4}.app{max-width:430px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.15)}.bottom-nav{max-width:430px}#sos{left:calc(50% - 201px)}}
+    </style>
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- ===== SPLASH ===== -->
+        <div class="screen active" id="splash">
+            <div style="flex:1;"></div>
+            <button class="btn-splash" data-t="start" onclick="goTo('login')">ابدئي الآن</button>
+            <div style="flex:0.5;"></div>
+        </div>
+
+        <!-- ===== LOGIN ===== -->
+        <div class="screen" id="login">
+            <div class="login-card">
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-title">تسجيل الدخول</div>
+                <div class="login-desc">أدخلي بيانات حسابك</div>
+                <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="email" />
+                <input type="password" class="form-input" placeholder="كلمة المرور" id="password" />
+                <button class="btn-login" onclick="doLogin()">دخول</button>
+                <div class="signup-link">ليس لديك حساب؟ <a onclick="goTo('signup')">إنشاء حساب</a></div>
+            </div>
+        </div>
+
+        <!-- ===== SIGNUP ===== -->
+        <div class="screen" id="signup">
+            <div class="login-card">
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-title">إنشاء حساب</div>
+                <div class="login-desc">أدخلي بياناتك للتسجيل</div>
+                <input type="text" class="form-input" placeholder="الاسم الكامل" id="fullname" />
+                <input type="email" class="form-input" placeholder="البريد الإلكتروني" id="signupEmail" />
+                <input type="number" class="form-input" placeholder="العمر" id="signupAge" min="12" max="60" />
+                <input type="tel" class="form-input" placeholder="رقم الهاتف (اختياري)" id="signupPhone" />
+                <input type="password" class="form-input" placeholder="كلمة المرور" id="signupPass" />
+                <input type="password" class="form-input" placeholder="تأكيد كلمة المرور" id="signupConfirm" />
+                <label class="radio-item" style="margin:8px 0;font-size:.8rem"><input type="checkbox" id="consent"> أوافق على معالجة بياناتي الصحية لتقديم الخدمة، ولا تُتاح إلا للمختصين المخولين</label>
+                <button class="btn-login" onclick="doSignup()">إنشاء حساب</button>
+                <div class="signup-link">لديك حساب؟ <a onclick="goTo('login')">تسجيل الدخول</a></div>
+            </div>
+        </div>
+
+        <!-- ===== HOME ===== -->
+        <div class="screen" id="home">
+            <div class="header-home">
+                <div id="bell" onclick="notif()"><i class="fas fa-bell"></i><span id="nb"></span></div>
+                <div class="header-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="header-text">
+                    <div class="header-name" data-t="hi">مرحباً بكِ!</div>
+                    <div class="header-subtext">كيف يمكننا مساعدتكِ؟</div>
+                </div>
+            </div>
+            <div class="grid-cards" id="homeGrid"></div>
+        </div>
+
+        <!-- ===== PREGNANCY ===== -->
+        <div class="screen" id="pregnancy">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">متابعة الحمل</div>
+            </div>
+            <div class="detail-content" id="pregBody"></div>
+        </div>
+
+        
+
+        <!-- ===== MENTAL HEALTH ===== -->
+        <div class="screen" id="mental">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">استشارة نفسية</div>
+            </div>
+            <div class="detail-content">
+                <div class="card text-center">
+                    <div style="font-size:2.6rem;color:#D37586;margin-bottom:6px;"><i class="fas fa-brain"></i></div>
+                    <div class="card-title" style="justify-content:center;">صحتك النفسية أولوية</div>
+                    <div class="card-text" style="margin-bottom:10px;">جلسات مع متخصصين للحوامل والأمهات</div>
+                    <button class="btn-primary" onclick="goTo('videocall')"><i class="fas fa-video"></i> احجزي جلسة فيديو</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-check"></i> الموضوعات الشائعة</div>
+                    <div class="card-text">• القلق والتوتر • الاكتئاب • تقلبات المزاج</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== VIDEO CALL ===== -->
+        <div class="screen" id="videocall">
+            <div class="doctor-bg"></div>
+            <div class="overlay"></div>
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('mental')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">جلسة فيديو</div>
+            </div>
+            <div class="selfie-window">
+                <div class="selfie-label">أنتِ</div>
+            </div>
+            <div class="video-controls-full">
+                <button class="control-btn mic" onclick="toggleMic(this)"><i class="fas fa-microphone"></i></button>
+                <button class="control-btn camera" onclick="toggleCamera(this)"><i class="fas fa-video"></i></button>
+                <button class="control-btn end" onclick="goTo('home')"><i class="fas fa-phone-slash"></i></button>
+            </div>
+        </div>
+
+        <!-- ===== POSTPARTUM ===== -->
+        <div class="screen" id="postpartum">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">ما بعد الولادة</div>
+            </div>
+            <div class="detail-content">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-heart-pulse"></i> التعافي الجسدي</div>
+                    <div class="card-text">• راحة تامة أول أسبوعين • تجنب الأنشطة الشاقة • تمارين قاع الحوض</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-brain"></i> الصحة النفسية</div>
+                    <div class="card-text">اطلبي الدعم من الأهل والمتخصصين متى احتجتِ</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-utensils"></i> التغذية والراحة</div>
+                    <div class="card-text">• طعام صحي متوازن • سوائل كافية • نوم منتظم</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DAILY TIPS ===== -->
+        <div class="screen" id="tips">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">نصائح يومية</div>
+            </div>
+            <div class="detail-content" id="tipsBody">
+                <div class="card" style="border-right:4px solid #D37586;">
+                    <div class="card-title"><i class="fas fa-sun" style="color:#f4a460;"></i> فيتامين D</div>
+                    <div class="card-text">تناوليه من الحليب والأسماك والتعرض للشمس</div>
+                </div>
+                <div class="card" style="border-right:4px solid #7A9B8A;">
+                    <div class="card-title"><i class="fas fa-droplet" style="color:#4a90d9;"></i> الترطيب</div>
+                    <div class="card-text">اشربي 8-10 أكواب من الماء يومياً</div>
+                </div>
+                <div class="card" style="border-right:4px solid #A67FB5;">
+                    <div class="card-title"><i class="fas fa-person-walking" style="color:#7a9b8a;"></i> المشي</div>
+                    <div class="card-text">قومي بنزهة خفيفة لمدة 30 دقيقة يومياً</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== EMERGENCY ===== -->
+        <div class="screen" id="emergency">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">الطوارئ</div>
+            </div>
+            <div class="detail-content">
+                <button class="btn-emergency" onclick="callEmergency()"><i class="fas fa-phone-alt"></i> اتصل بالطوارئ الآن</button>
+                <div class="emergency-grid">
+                    <div class="emergency-card" onclick="contactDoctor()">
+                        <div class="emergency-icon"><i class="fas fa-phone"></i></div>
+                        <div style="font-weight:600;color:#333;font-size:0.85rem;">اتصال بالطبيب</div>
+                    </div>
+                    <div class="emergency-card" onclick="contactHospital()">
+                        <div class="emergency-icon"><i class="fas fa-hospital"></i></div>
+                        <div style="font-weight:600;color:#333;font-size:0.85rem;">اتصال بالمستشفى</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-triangle-exclamation" style="color:#E53935;"></i> أعراض طارئة</div>
+                    <div class="card-text">نزيف مهبلي • آلام حادة • فقدان وعي • تسمم حمل</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RECORDS ===== -->
+        <div class="screen" id="records">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">حسابي</div>
+            </div>
+            <div class="detail-content" id="recBody"></div>
+        </div>
+
+        <!-- ===== LANGUAGE ===== -->
+        <div class="screen" id="lang">
+            <div class="login-card">
+                <div class="login-logo"><img src="logo.png" alt="لَكِ" /></div>
+                <div class="login-title">اختيار اللغة / Language / Langue</div>
+                <div class="opt" onclick="setLang('ar')">العربية</div>
+                <div class="opt" onclick="setLang('fr')">Français</div>
+                <div class="opt" onclick="setLang('en')">English</div>
+            </div>
+        </div>
+
+        <!-- ===== ONBOARDING ===== -->
+        <div class="screen" id="onb">
+            <div class="detail-header">
+                <div class="back-btn" onclick="obBack()"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">لنتعرّف عليكِ</div>
+            </div>
+            <div class="detail-content">
+                <div class="stepbar"><div id="obBar"></div></div>
+                <div id="s1">
+                    <div class="card-title">في أي مرحلة أنتِ الآن؟</div>
+                    <div class="opt" data-k="stage" data-v="plan" onclick="pick(this)"><i class="fas fa-seedling"></i> أخطط للحمل / تتبع دورتي</div>
+                    <div class="opt" data-k="stage" data-v="preg" onclick="pick(this)"><i class="fas fa-person-pregnant"></i> أنا حامل</div>
+                    <div class="opt" data-k="stage" data-v="birth" onclick="pick(this)"><i class="fas fa-hospital"></i> أستعد للولادة</div>
+                    <div class="opt" data-k="stage" data-v="post" onclick="pick(this)"><i class="fas fa-baby"></i> وضعتُ مولودي (ما بعد الولادة)</div>
+                </div>
+                <div id="s2">
+                    <div class="card-title">أدخلي تاريخ آخر دورة شهرية</div>
+                    <input type="date" class="form-input" id="lmp" />
+                </div>
+                <div id="s3">
+                    <div class="card-title">كيف تريدين حساب حملك؟</div>
+                    <div class="opt" data-k="method" data-v="lmp" onclick="pick(this)">آخر دورة شهرية</div>
+                    <div class="opt" data-k="method" data-v="conc" onclick="pick(this)">تاريخ الحمل (الإخصاب)</div>
+                    <div class="opt" data-k="method" data-v="due" onclick="pick(this)">تاريخ الاستحقاق (الولادة)</div>
+                    <div class="opt" data-k="method" data-v="us" onclick="pick(this)">تاريخ الموجات فوق الصوتية</div>
+                    <div id="mbox">
+                        <div class="lbl" id="mlbl"></div>
+                        <input type="date" class="form-input" id="m_date" />
+                        <input type="number" class="form-input" id="m_weeks" placeholder="عدد أسابيع الحمل وقت الفحص" min="4" max="42" />
+                    </div>
+                </div>
+                <div id="s4">
+                    <div class="card-title">متوسط طول دورتك (بالأيام)</div>
+                    <input type="number" class="form-input" id="cyc" value="28" min="20" max="45" />
+                    <div id="twinBox"><div class="card-title">عدد الأجنة</div>
+                        <div class="opt" data-k="twins" data-v="1" onclick="pick(this)">جنين واحد</div>
+                        <div class="opt" data-k="twins" data-v="2" onclick="pick(this)">توأم أو أكثر</div></div>
+                </div>
+                <div id="s5">
+                    <div class="card-title">أيّها تصفك بشكل أفضل وأدق؟</div>
+                    <div class="opt" data-k="role" data-v="post" onclick="pick(this)">أنا حالياً في فترة ما بعد الولادة</div>
+                    <div class="opt" data-k="role" data-v="preg" onclick="pick(this)">أنا حامل</div>
+                    <div class="opt" data-k="role" data-v="hcp" onclick="pick(this)">أنا أخصائية/أخصائي رعاية صحية</div>
+                    <div class="opt" data-k="role" data-v="fam" onclick="pick(this)">أنا صديق أو فرد من العائلة</div>
+                </div>
+                <div id="s6">
+                    <div class="card-title">ما المواضيع التي تثير اهتمامك أكثر؟</div>
+                    <div class="chips" id="intC"></div>
+                </div>
+                <div id="s7">
+                    <div class="card-title">تاريخ ميلاد طفلك</div>
+                    <input type="date" class="form-input" id="bdob" />
+                    <div class="card-title">نوع الولادة</div>
+                    <div class="opt" data-k="dtype" data-v="nat" onclick="pick(this)">طبيعية</div>
+                    <div class="opt" data-k="dtype" data-v="cs" onclick="pick(this)">قيصرية</div>
+                </div>
+                <button class="btn-primary" id="nxt" onclick="obNext()">التالي</button>
+            </div>
+        </div>
+
+        <!-- ===== TOOLS ===== -->
+        <div class="screen" id="tools">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">الأدوات</div>
+            </div>
+            <div class="detail-content"><div class="tgrid" id="toolGrid"></div></div>
+        </div>
+        <div class="screen" id="tool">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('tools')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title" id="toolTitle"></div>
+            </div>
+            <div class="detail-content" id="toolBody"></div>
+        </div>
+
+        <!-- ===== BLOG ===== -->
+        <div class="screen" id="blog">
+            <div class="detail-header">
+                <div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div>
+                <div class="detail-title">مدونات الحمل</div>
+            </div>
+            <div class="detail-content" id="blogBody"></div>
+        </div>
+
+        <!-- ===== APPOINTMENTS ===== -->
+        <div class="screen" id="appointments">
+            <div class="detail-header"><div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div><div class="detail-title">حجز موعد</div></div>
+            <div class="detail-content" id="apBody"></div>
+        </div>
+        <!-- ===== MOOD ===== -->
+        <div class="screen" id="mood">
+            <div class="detail-header"><div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div><div class="detail-title">صحتي النفسية</div></div>
+            <div class="detail-content" id="moodBody"></div>
+        </div>
+        <div class="screen" id="pg">
+            <div class="detail-header"><div class="back-btn" id="pgBack"><i class="fas fa-arrow-right"></i></div><div class="detail-title" id="pgT"></div></div>
+            <div class="detail-content" id="pgBody"></div>
+        </div>
+        <div class="screen" id="msgs">
+            <div class="detail-header"><div class="back-btn" onclick="goTo('home')"><i class="fas fa-arrow-right"></i></div><div class="detail-title">الرسائل والتواصل</div></div>
+            <div class="detail-content" id="msgBody"></div>
+        </div>
+        <div id="sos" onclick="goTo('emergency')"><i class="fas fa-phone-alt"></i></div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <div class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" onclick="goTo('home')"><i class="fas fa-home"></i> <span data-t="n1">الرئيسية</span></button>
+            <button class="nav-item" onclick="goTo('appointments')"><i class="fas fa-calendar-check"></i> <span data-t="n2">المواعيد</span></button>
+            <button class="nav-item" onclick="goTo('msgs')"><i class="fas fa-comments"></i> <span data-t="n3">الرسائل</span></button>
+            <button class="nav-item" onclick="goTo('records')"><i class="fas fa-user"></i> <span data-t="n4">حسابي</span></button>
+        </div>
+        <!-- ===== MODAL ===== -->
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <div class="modal-title" id="modalTitle">تم التأكيد</div>
+                <div class="modal-text" id="modalText">تم حفظ البيانات بنجاح</div>
+                <button class="modal-btn" onclick="closeModal()">حسناً</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== التحقق من تحميل الصورة وإظهار fallback =====
+        (function checkImage() {
+            const splash = document.getElementById('splash');
+            const img = new Image();
+            img.onload = function() { splash.classList.remove('no-image'); };
+            img.onerror = function() { splash.classList.add('no-image'); };
+            img.src = '1.png';
+        })();
+
+        // ===== تسجيل Service Worker =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(() => console.log('SW registration failed'));
+        }
+
+        // ===== NAVIGATION =====
+        function goTo(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screen);
+            if (target) target.classList.add('active');
+
+            const nav = document.getElementById('bottomNav');
+            const mainScreens = ['home', 'appointments', 'msgs', 'records'];
+            nav.style.display = mainScreens.includes(screen) ? 'flex' : 'none';
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (mainScreens.includes(screen)) {
+                const idx = mainScreens.indexOf(screen);
+                const items = document.querySelectorAll('.nav-item');
+                if (items[idx]) items[idx].classList.add('active');
+            }
+        }
+
+        // ===== LOGIN =====
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const pass = nz(document.getElementById('password').value);
+            if (!email || !pass) return showModal('تنبيه', 'الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+            const a = ST('acc');
+            if (!a) return showModal('تنبيه', 'لا يوجد حساب بعد، أنشئي حساباً أولاً');
+            if (a.email.trim().toLowerCase() !== email) return showModal('تنبيه', 'هذا البريد غير مسجل');
+            if (!(a.pass === await hp(pass) || nz(a.pass) === pass)) return showModal('تنبيه', 'كلمة المرور غير صحيحة');
+            ST('sess', { e: a.email }); applyLang(); goTo(S.done ? 'home' : 'onb');
+        }
+
+        // ===== APPOINTMENTS =====
+        function selectDate(el) {
+            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function selectTime(el) {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function confirmAppointment() {
+            showModal('تم التأكيد', 'تم حجز موعدك بنجاح');
+        }
+
+        // ===== VIDEO CONTROLS =====
+        function toggleMic(btn) {
+            btn.classList.toggle('muted');
+            btn.innerHTML = btn.classList.contains('muted') ?
+                '<i class="fas fa-microphone-slash"></i>' :
+                '<i class="fas fa-microphone"></i>';
+        }
+
+        function toggleCamera(btn) {
+            btn.classList.toggle('cam-off');
+            btn.innerHTML = btn.classList.contains('cam-off') ?
+                '<i class="fas fa-video-slash"></i>' :
+                '<i class="fas fa-video"></i>';
+        }
+
+        // ===== EMERGENCY =====
+        function callEmergency() { showModal('الطوارئ', 'جارٍ الاتصال بخدمة الطوارئ'); }
+
+        function contactDoctor() { showModal('اتصال بالطبيب', 'جارٍ الاتصال بالطبيب المتابع...'); }
+
+        function contactHospital() { showModal('اتصال بالمستشفى', 'جارٍ الاتصال بمستشفى النور...'); }
+
+        // ===== MODAL =====
+        function showModal(title, text) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ===== v2: state, language, onboarding, calculator, tools, blog =====
+        const $ = id => document.getElementById(id), D = 864e5;
+        let STOK = true; const MEM = {};
+        function ST(k, v) {
+            const key = 'lk_' + k;
+            try {
+                if (v === undefined) { const r = localStorage.getItem(key); return r === null ? (MEM[key] === undefined ? null : MEM[key]) : JSON.parse(r); }
+                localStorage.setItem(key, JSON.stringify(v)); MEM[key] = v;
+            } catch (e) { STOK = false; if (v === undefined) return MEM[key] === undefined ? null : MEM[key]; MEM[key] = v; }
+        }
+        const nz = t => String(t || '').trim().replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+        let S = ST('s') || {};
+        const td = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+        const fm = d => d.toLocaleDateString({ ar: 'ar-DZ', en: 'en-GB', fr: 'fr-FR' }[S.lang || 'ar'], { day: 'numeric', month: 'long', year: 'numeric' });
+
+        const T = {
+            ar: { start: 'ابدئي الآن', hi: 'مرحباً بكِ', c1: 'متابعة الحمل', c2: 'حجز موعد', c3: 'استشارة نفسية', c4: 'نصائح يومية', c5: 'ما بعد الولادة', c6: 'الطوارئ', c7: 'الأدوات', c8: 'المدونات', n1: 'الرئيسية', n2: 'المواعيد', n3: 'الرسائل', n4: 'حسابي' },
+            en: { start: 'Get started', hi: 'Welcome', c1: 'Pregnancy tracker', c2: 'Book appointment', c3: 'Mental health', c4: 'Daily tips', c5: 'Postpartum', c6: 'Emergency', c7: 'Tools', c8: 'Blog', n1: 'Home', n2: 'Appointments', n3: 'Messages', n4: 'Account' },
+            fr: { start: 'Commencer', hi: 'Bienvenue', c1: 'Suivi de grossesse', c2: 'Prendre rendez-vous', c3: 'Santé mentale', c4: 'Conseils du jour', c5: 'Post-partum', c6: 'Urgences', c7: 'Outils', c8: 'Blog', n1: 'Accueil', n2: 'Rendez-vous', n3: 'Messages', n4: 'Compte' }
+        };
+        function applyLang() {
+            const l = S.lang || 'ar', d = l === 'ar' ? 'rtl' : 'ltr';
+            if ($('homeGrid')) renderHome();
+            document.documentElement.lang = l; document.documentElement.dir = d;
+            document.documentElement.style.direction = document.body.style.direction = d;
+            const acc = ST('acc'), fn = acc && acc.name ? acc.name.split(' ')[0] : '';
+            document.querySelectorAll('[data-t]').forEach(e => e.textContent = e.dataset.t === 'hi' ? T[l].hi + (fn ? (l === 'ar' ? '، ' : ', ') + fn : '') + (l === 'fr' ? ' !' : '!') : T[l][e.dataset.t]);
+        }
+        function setLang(l) { S.lang = l; ST('s', S); applyLang(); goTo('login'); }
+
+        // ----- onboarding -----
+        let oi = 0;
+        const stg = () => S.stage || (S.mode === 'cycle' ? 'plan' : 'preg');
+        const flow = () => ({ plan: [1, 2, 4], preg: [1, 2, 3, 4, 5, 6], birth: [1, 2, 3, 4, 5, 6], post: [1, 7, 5, 6] })[stg()];
+        const INT = {
+            post: [['rec', 'تعافٍ بدني'], ['mood', 'اكتئاب ما بعد الولادة'], ['self', 'وقت شخصي'], ['baby', 'رضاعة طبيعية ورعاية الطفل'], ['emo', 'الحالة المزاجية والرفاهية العاطفية'], ['sleep', 'النوم والطاقة'], ['nut', 'التغذية وإنقاص الوزن']],
+            preg: [['wk', 'متابعة الجنين أسبوعاً بأسبوع'], ['nut', 'ماذا آكل'], ['sym', 'فهم أعراضي'], ['mood', 'الاطمئنان النفسي'], ['birth', 'الاستعداد للولادة'], ['sup', 'دعم الحمل']],
+            hcp: [['sym', 'أعراض الحمل'], ['rec', 'التعافي بعد الولادة'], ['mood', 'الصحة النفسية'], ['baby', 'الرضاعة والطفل']],
+            fam: [['help', 'كيف أدعمها'], ['mood', 'الصحة النفسية'], ['rec', 'التعافي'], ['baby', 'رعاية المولود']]
+        };
+        function sync() { document.querySelectorAll('.opt[data-k]').forEach(o => o.classList.toggle('on', S[o.dataset.k] === o.dataset.v)); mUpd(); }
+        function pick(el) { S[el.dataset.k] = el.dataset.v; sync(); }
+        function mUpd() {
+            const m = S.method || 'lmp';
+            $('mbox').style.display = m === 'lmp' ? 'none' : 'block';
+            $('m_weeks').style.display = m === 'us' ? 'block' : 'none';
+            $('mlbl').textContent = { conc: 'تاريخ الحمل', due: 'تاريخ الاستحقاق', us: 'تاريخ الموجات فوق الصوتية' }[m] || '';
+        }
+        function ob(i) {
+            oi = i; const f = flow();
+            for (let k = 1; k <= 7; k++) $('s' + k).style.display = f[i] === k ? 'block' : 'none';
+            $('obBar').style.width = (i + 1) / f.length * 100 + '%';
+            $('nxt').textContent = i === f.length - 1 ? 'ابدئي' : 'التالي';
+            $('twinBox').style.display = stg() === 'plan' ? 'none' : 'block';
+            $('lmp').parentElement.querySelector('.card-title').textContent = stg() === 'plan' ? 'أدخلي تاريخ بداية آخر دورة شهرية' : 'أدخلي تاريخ آخر دورة شهرية';
+            if (f[i] === 6) {
+                S.int = S.int || [];
+                $('intC').innerHTML = (INT[S.role] || INT.preg).map(([k, l]) => `<span class="chip ${S.int.includes(k) ? 'on' : ''}" onclick="tg(this,'${k}')">${l}</span>`).join('');
+            }
+        }
+        function tg(el, k) { S.int = S.int.includes(k) ? S.int.filter(x => x !== k) : [...S.int, k]; el.classList.toggle('on'); }
+        function obBack() { if (oi > 0) ob(oi - 1); else goTo(S.done ? 'pregnancy' : 'login'); }
+        function obNext() {
+            const f = flow(), k = f[oi], m = t => showModal('تنبيه', t);
+            if (k === 1 && !S.stage) return m('اختاري مرحلتك');
+            if (k === 2) {
+                const v = $('lmp').value; if (!v) return m('أدخلي التاريخ');
+                if (new Date(v + 'T00:00') > td()) return m('التاريخ لا يمكن أن يكون في المستقبل');
+            }
+            if (k === 3 && (S.method || 'lmp') !== 'lmp') {
+                if (!$('m_date').value) return m('أدخلي التاريخ المطلوب');
+                if (S.method === 'us' && !(+$('m_weeks').value > 0)) return m('أدخلي عدد أسابيع الحمل وقت الفحص');
+            }
+            if (k === 5 && !S.role) return m('اختاري ما يصفك');
+            if (k === 7 && !$('bdob').value) return m('أدخلي تاريخ ميلاد الطفل');
+            if (oi < f.length - 1) return ob(oi + 1);
+            S.lmp = $('lmp').value; S.cyc = +$('cyc').value || 28; S.md = $('m_date').value; S.mw = +$('m_weeks').value;
+            S.mode = S.stage === 'plan' ? 'cycle' : 'preg'; S.bdob = $('bdob').value; if (S.mode === 'cycle') S.method = 'lmp';
+            S.method = S.method || 'lmp'; S.done = 1; ST('s', S); goTo('pregnancy');
+        }
+
+        // ----- pregnancy calculator -----
+        function calc() {
+            const m = S.method || 'lmp', cyc = S.cyc || 28; let due;
+            if (m === 'lmp') due = +new Date(S.lmp + 'T00:00') + (280 + cyc - 28) * D;
+            else { const d = +new Date(S.md + 'T00:00'); due = m === 'conc' ? d + 266 * D : m === 'due' ? d : d + (280 - (S.mw || 0) * 7) * D; }
+            const left = Math.round((due - td()) / D), g = 280 - left;
+            return { due: new Date(due), left, g, w: Math.floor(g / 7), d: g % 7 };
+        }
+        const SZ = [[4, 'بذرة خشخاش (2 مم)'], [8, 'حبة توت (1.6 سم)'], [12, 'ليمونة (5 سم)'], [16, 'أفوكادو (11 سم)'], [20, 'موزة (25 سم)'], [24, 'كوز ذرة (30 سم)'], [28, 'باذنجانة (37 سم)'], [32, 'جزرة كبيرة (42 سم)'], [36, 'خسّة (47 سم)'], [40, 'بطيخة صغيرة (51 سم)']];
+        const szOf = w => [...SZ].reverse().find(x => x[0] <= w) || SZ[0];
+        const TIPS = ['الثلث الأول: حمض الفوليك، وجبات صغيرة للغثيان، وراحة كافية.', 'الثلث الثاني: أطعمة غنية بالحديد والكالسيوم، ومشي خفيف، وتابعي حركة الجنين.', 'الثلث الثالث: جهزي حقيبة المستشفى، تعرفي على علامات المخاض، وراجعي طبيبك بانتظام.'];
+        function renderPreg() {
+            const b = $('pregBody');
+            if (!S.done) { b.innerHTML = '<div class="card text-center"><div class="card-text">أدخلي بياناتك لنحسب لكِ موعد الولادة وتفاصيل حملك.</div><button class="btn-primary" onclick="goTo(\'onb\')">ابدئي الإعداد</button></div>'; return; }
+            const edit = '<button class="btn-sec" onclick="goTo(\'onb\')"><i class="fas fa-pen"></i> تعديل بياناتي</button>';
+            if (stg() === 'post') {
+                const dd = Math.max(0, Math.floor((td() - new Date(S.bdob + 'T00:00')) / D));
+                b.innerHTML = `<div class="card text-center"><div class="big">${Math.floor(dd / 7)}</div><div class="card-text">أسبوع منذ الولادة (${dd} يوماً) • ${S.dtype === 'cs' ? 'ولادة قيصرية' : 'ولادة طبيعية'}</div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-heart"></i> صحتك النفسية</div><div class="card-text">الأسابيع الأولى بعد الولادة حساسة نفسياً. أجري فحص المزاج بانتظام.</div><button class="btn-primary" onclick="goTo('mood')">فحص المزاج</button></div>
+                <div class="card"><div class="card-title"><i class="fas fa-notes-medical"></i> التعافي</div><div class="card-text">${S.dtype === 'cs' ? 'راقبي التئام الجرح وتجنبي حمل الأثقال حتى توجيه الطبيبة.' : 'ارتاحي وتابعي النزيف والالتئام، وابدئي تمارين قاع الحوض تدريجياً بعد موافقة الطبيبة.'}</div></div>
+                <button class="btn-sec" onclick="goTo('appointments')">حجز فحص ما بعد الولادة</button>${edit}`;
+                return;
+            }
+            if (S.mode === 'cycle') {
+                let nx = +new Date(S.lmp + 'T00:00'); const cy = S.cyc || 28; while (nx < +td()) nx += cy * D;
+                const ov = nx - 14 * D, left = Math.round((nx - td()) / D);
+                b.innerHTML = `<div class="card text-center"><div class="big">${left}</div><div class="card-text">يوم حتى الدورة القادمة (${fm(new Date(nx))})</div></div>
+                <div class="card"><div class="card-title"><i class="fas fa-seedling"></i> الإباضة والخصوبة</div><div class="card-text">الإباضة المتوقعة: ${fm(new Date(ov))}<br>نافذة الخصوبة: ${fm(new Date(ov - 5 * D))} – ${fm(new Date(ov + D))}<br>طول الدورة: ${cy} يوماً<br><small>التواريخ تقديرية وليست وسيلة لمنع الحمل.</small></div></div>${edit}`;
+                return;
+            }
+            const c = calc();
+            if (c.g < 0 || c.g > 300) { b.innerHTML = '<div class="card"><div class="card-text">التاريخ المدخل غير منطقي، يرجى تعديله.</div></div>' + edit; return; }
+            const pct = Math.min(100, c.g / 280 * 100), tri = c.w < 13 ? 1 : c.w < 28 ? 2 : 3, mo = Math.min(9, Math.floor(c.g / 30.44) + 1), wk = Math.max(1, Math.min(40, c.w));
+            let cells = ''; for (let i = 1; i <= 40; i++) cells += `<div class="wc ${i < wk ? 'p' : i === wk ? 'n' : ''}" ${i >= 4 ? `onclick="weekPage(${i})" style="cursor:pointer"` : ''}>${i}</div>`;
+            b.innerHTML = `<div class="card text-center"><div class="progress-ring" style="background:conic-gradient(#D37586 ${pct}%,#F5E1E4 0)"><div class="progress-inner"><div class="week-number">${c.w}</div><div class="week-text">أسبوع</div></div></div>
+            <p style="font-weight:700;color:#333;margin:4px 0 2px;">أنتِ في الأسبوع ${c.w} و ${c.d} أيام</p>
+            <p style="color:#8FA89B;font-size:.8rem;">الأيام المتبقية: ${Math.max(0, c.left)} يوماً</p><div class="pregnancy-progress-bar"><div style="width:${pct}%"></div></div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-calendar-check"></i> موعد الولادة المتوقع</div><div class="card-text">${fm(c.due)}${S.twins === '2' ? ' (حمل متعدد: قد تكون الولادة أبكر، ناقشي ذلك مع طبيبتك)' : ''}<br>الثلث ${['الأول', 'الثاني', 'الثالث'][tri - 1]} • الشهر ${mo}</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-table-cells"></i> مخطط الحمل (الأسابيع)</div><div class="wgrid">${cells}</div><div class="card-text">الأسابيع 1–13 ثلث أول • 14–27 ثلث ثانٍ • 28–40 ثلث ثالث</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-bullseye"></i> حجم الطفل التقريبي</div><div class="card-text">${szOf(c.w)[1]}</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-hand-holding-heart"></i> نصيحة الثلث</div><div class="card-text">${TIPS[tri - 1]}</div></div>
+            <button class="btn-primary" onclick="weekPage(${Math.max(4, wk)})"><i class="fas fa-calendar-week"></i> تفاصيل الأسبوع ${wk}</button><button class="btn-sec" onclick="hr()"><i class="fas fa-heart-pulse"></i> متابعة الحمل عالي الخطورة</button><button class="btn-sec" onclick="goTo('tools')"><i class="fas fa-toolbox"></i> أدوات الحمل</button>${edit}`;
+        }
+
+        // ----- tools -----
+        const TL = [['kick', 'fa-baby', 'عداد الركلات'], ['contr', 'fa-stopwatch', 'مؤقت الانقباض'], ['kegel', 'fa-dumbbell', 'تمرين كيجل'], ['sym', 'fa-notes-medical', 'تتبع الأعراض'], ['weight', 'fa-weight-scale', 'تتبع الوزن'], ['meal', 'fa-bowl-food', 'خطة الوجبات'], ['size', 'fa-ruler', 'حجم الطفل'], ['bag', 'fa-suitcase-medical', 'حقيبة المستشفى'], ['notes', 'fa-calendar-days', 'التقويم والمذكرات'], ['meds', 'fa-pills', 'تذكير الدواء'], ['names', 'fa-signature', 'أسماء الطفل'], ['tasbih', 'fa-circle-dot', 'المسبحة'], ['labor', 'fa-hospital', 'الولادة'], ['breath', 'fa-wind', 'تمرين التنفس']];
+        $('toolGrid').innerHTML = TL.map(t => `<div class="card-home" onclick="openTool('${t[0]}')"><i class="fas ${t[1]}"></i>${t[2]}</div>`).join('');
+        let cur = '', kg;
+        function openTool(k) { cur = k; $('toolTitle').textContent = TL.find(t => t[0] === k)[2]; refresh(); goTo('tool'); }
+        function refresh() { clearInterval(kg); $('toolBody').innerHTML = R[cur](); }
+        function add(k, f) {
+            const o = { d: new Date().toLocaleDateString() }; f.forEach(i => o[i] = $(i).value.trim());
+            if (!o[f[f.length - 1]]) return; const a = ST(k) || []; a.push(o); ST(k, a); refresh();
+        }
+        function del(k, i) { const a = ST(k) || []; a.splice(i, 1); ST(k, a); refresh(); }
+        const delB = (k, i) => `<span onclick="del('${k}',${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span>`;
+        const R = {};
+
+        R.kick = () => { const k = ST('kick') || { n: 0 }; return `<div class="card text-center"><div class="big" id="kn">${k.n}</div><div class="card-text" id="kt">${k.n ? kMsg(k) : 'اضغطي عند كل حركة يلاحظها الجنين'}</div><button class="btn-primary" onclick="kTap()"><i class="fas fa-baby"></i> حركة</button><button class="btn-sec" onclick="ST('kick',{n:0});refresh()">جلسة جديدة</button></div><div class="card"><div class="card-text">المعتاد الوصول إلى 10 حركات خلال ساعتين. إذا لاحظتِ نقصاً واضحاً في حركة الجنين فتواصلي مع طبيبك فوراً.</div></div>`; };
+        const kMsg = k => 'بدأت منذ ' + Math.round((Date.now() - k.t) / 60000) + ' دقيقة' + (k.n >= 10 ? ' — وصلتِ إلى 10 حركات' : '');
+        function kTap() { const k = ST('kick') || { n: 0 }; if (!k.n) k.t = Date.now(); k.n++; ST('kick', k); $('kn').textContent = k.n; $('kt').textContent = kMsg(k); }
+
+        let cs = null;
+        R.contr = () => { cs = null; return `<div class="card text-center"><button class="btn-primary" id="cb" onclick="cTog()"><i class="fas fa-play"></i> بدأ انقباض</button><div id="cl">${cList()}</div><button class="btn-sec" onclick="ST('c',[]);refresh()">مسح السجل</button></div><div class="card"><div class="card-text"><b>قاعدة 5-1-1:</b> انقباضات كل 5 دقائق أو أقل، تدوم نحو دقيقة، لمدة ساعة: توجهي إلى المستشفى. وكذلك عند نزول الماء أو النزيف أو نقص حركة الجنين.</div></div>`; };
+        function cList() {
+            const a = ST('c') || [];
+            return '<div class="card-title">عدد الانقباضات: ' + a.length + '</div>' + a.slice(-6).reverse().map((x, i, r) => `<div class="row"><span>${new Date(x.s).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span><span>المدة ${x.d} ث</span><span>${r[i + 1] ? 'التكرار كل ' + ((x.s - r[i + 1].s) / 60000).toFixed(1) + ' د' : '—'}</span></div>`).join('');
+        }
+        function cTog() {
+            if (!cs) { cs = Date.now(); $('cb').innerHTML = '<i class="fas fa-stop"></i> انتهى الانقباض'; }
+            else { const a = ST('c') || []; a.push({ s: cs, d: Math.round((Date.now() - cs) / 1000) }); ST('c', a.slice(-30)); cs = null; $('cb').innerHTML = '<i class="fas fa-play"></i> بدأ انقباض'; $('cl').innerHTML = cList(); }
+        }
+
+        R.kegel = () => '<div class="card text-center"><div class="card-text" id="kgt">شدّي عضلات قاع الحوض 5 ثوانٍ ثم ارتخي 5 ثوانٍ، وكرري 10 مرات.</div><button class="btn-primary" onclick="kegel()">ابدئي التمرين</button></div>';
+        function kegel() {
+            clearInterval(kg); let t = 0;
+            kg = setInterval(() => { const r = Math.floor(t / 10); if (r >= 10) { clearInterval(kg); $('kgt').textContent = 'أحسنتِ أكملتِ 10 مرات'; return; } const s = t % 10; $('kgt').textContent = (s < 5 ? 'شدّي ' : 'ارتخي ') + (5 - s % 5) + ' — مرة ' + (r + 1) + '/10'; t++; }, 1000);
+        }
+
+        const SY = [['mood', 'المزاج'], ['nau', 'الغثيان'], ['en', 'مستوى الطاقة'], ['ap', 'الشهية'], ['sl', 'جودة النوم']];
+        R.sym = () => {
+            const h = (ST('sym') || []).slice(-5).reverse();
+            return `<div class="card"><div class="card-text">من 1 (قليل) إلى 5 (كثير)</div>${SY.map(([k, l]) => `<div class="card-title">${l}</div><input type="range" min="1" max="5" value="3" id="y_${k}" class="rng">`).join('')}
+            <div class="card-title">الأعراض الشائعة</div><div class="chips" id="symc">${['الغثيان والقيء', 'التعب والإرهاق', 'آلام الظهر والحوض', 'الصداع', 'الإمساك والانتفاخ', 'تورم الأطراف', 'تغيرات الثدي', 'اضطرابات النوم', 'تغيرات الشهية والوزن', 'التقلصات', 'حركة الجنين', 'قرحة المعدة', 'تبول متكرر', 'تقلبات المزاج', 'إفرازات'].map(x => `<span class="chip" onclick="this.classList.toggle('on')">${x}</span>`).join('')}</div>
+            <input id="symo" class="form-input" placeholder="أعراض أخرى تريدين تسجيلها"><button class="btn-primary" onclick="symSave()">حفظ اليوم</button></div>
+            <div class="card"><div class="card-text">صداع شديد مع تورم مفاجئ أو زغللة، أو نزيف، أو ألم حاد: اتصلي بطبيبك أو الطوارئ فوراً.</div></div>
+            ${h.map(x => `<div class="card"><div class="card-title">${x.d}</div><div class="card-text">${SY.map(([k, l]) => l + ': ' + x[k]).join(' • ')}<br>${x.s.concat(x.o ? [esc(x.o)] : []).join('، ') || 'لا أعراض مسجلة'}</div></div>`).join('')}`;
+        };
+        function symSave() {
+            const o = { d: new Date().toLocaleDateString(), s: [...document.querySelectorAll('#symc .on')].map(e => e.textContent) };
+            SY.forEach(([k]) => o[k] = $('y_' + k).value); o.o = $('symo').value.trim(); const a = ST('sym') || []; a.push(o); ST('sym', a); refresh(); showModal('تم', 'تم حفظ أعراض اليوم');
+        }
+
+        R.weight = () => { const a = ST('weight') || []; return `<div class="card"><input type="number" step="0.1" id="w" class="form-input" placeholder="وزنك اليوم (كغ)"><button class="btn-primary" onclick="add('weight',['w'])">إضافة</button></div><div class="card">${a.map((x, i) => `<div class="row"><span>${x.d}</span><span>${x.w} كغ (${(x.w - a[0].w >= 0 ? '+' : '') + (x.w - a[0].w).toFixed(1)})</span>${delB('weight', i)}</div>`).reverse().join('') || '<div class="card-text">لا قياسات بعد</div>'}</div>`; };
+        R.notes = () => { const a = ST('notes') || []; return `<div class="card"><input type="date" id="nd" class="form-input"><input type="text" id="nt" class="form-input" placeholder="موعد أو ملاحظة"><button class="btn-primary" onclick="add('notes',['nd','nt'])">إضافة</button></div><div class="card">${a.map((x, i) => `<div class="row"><span>${x.nd || x.d}</span><span>${x.nt}</span>${delB('notes', i)}</div>`).join('') || '<div class="card-text">لا مذكرات بعد</div>'}</div>`; };
+        R.meds = () => { const a = ST('meds') || []; return `<div class="card"><input type="time" id="mt" class="form-input"><input type="text" id="mn" class="form-input" placeholder="اسم الدواء / الفيتامين"><button class="btn-primary" onclick="add('meds',['mt','mn'])">إضافة</button></div><div class="card">${a.map((x, i) => `<div class="row"><span>${x.mt || '—'}</span><span>${x.mn}</span>${delB('meds', i)}</div>`).join('') || '<div class="card-text">لا أدوية مضافة</div>'}</div>`; };
+
+        const BAG = { 'للأم': ['الهوية والملف الطبي', 'ملابس مريحة وقمصان رضاعة', 'فوط نسائية للنفاس', 'مستلزمات النظافة الشخصية', 'مرطب وبلسم الشفاه', 'شاحن الهاتف', 'شبشب'], 'للطفل': ['حفاضات', 'عود قطني', 'مصاصة', 'ملابس للمولود وقبعة وجوارب', 'بطانية', 'مناديل مبللة'] };
+        R.bag = () => { const c = ST('bag') || {}; return Object.entries(BAG).map(([g, a]) => `<div class="card"><div class="card-title">${g}</div>${a.map(x => `<label class="radio-item" style="margin:4px 0"><input type="checkbox" ${c[x] ? 'checked' : ''} onchange="bagCk('${x}',this.checked)"> ${x}</label>`).join('')}</div>`).join(''); };
+        function bagCk(x, v) { const c = ST('bag') || {}; c[x] = v; ST('bag', c); }
+
+        const NM = { 'بنات': ['سارة', 'مريم', 'ليلى', 'جنى', 'ريم', 'لينا', 'نور', 'آية', 'حنين', 'خولة'], 'أولاد': ['محمد', 'آدم', 'يوسف', 'إبراهيم', 'أنس', 'ياسين', 'رياض', 'أمين', 'سليم', 'زكرياء'] };
+        R.names = () => { const f = ST('fav') || []; return Object.entries(NM).map(([g, a]) => `<div class="card"><div class="card-title">${g}</div><div class="chips">${a.map(n => `<span class="chip ${f.includes(n) ? 'on' : ''}" onclick="fav('${n}')">${n}</span>`).join('')}</div></div>`).join('') + `<div class="card"><div class="card-title"><i class="fas fa-heart"></i> المفضلة</div><div class="card-text">${f.join('، ') || 'اضغطي على اسم لإضافته'}</div></div>`; };
+        function fav(n) { let f = ST('fav') || []; f = f.includes(n) ? f.filter(x => x !== n) : [...f, n]; ST('fav', f); refresh(); }
+
+        let tc = 0, tsp = 0; const TSB = ['سبحان الله', 'الحمد لله', 'الله أكبر', 'أستغفر الله'];
+        R.tasbih = () => { tc = 0; return `<div class="chips">${TSB.map((x, i) => `<span class="chip ${i === tsp ? 'on' : ''}" onclick="tsp=${i};refresh()">${x}</span>`).join('')}</div><div class="card text-center"><div class="card-title" style="justify-content:center">${TSB[tsp]}</div><div class="big" id="tn">0</div><button class="btn-primary" style="padding:30px" onclick="tT()">سبّحي</button><button class="btn-sec" onclick="refresh()">تصفير</button></div>`; };
+        function tT() { tc++; $('tn').textContent = tc; if (tc % 33 === 0 && navigator.vibrate) navigator.vibrate(200); }
+
+        R.meal = () => '<div class="card"><div class="card-title"><i class="fas fa-sun"></i> الفطور</div><div class="card-text">شوفان بالحليب والفواكه، أو بيض مع خبز كامل.</div></div><div class="card"><div class="card-title"><i class="fas fa-utensils"></i> الغداء</div><div class="card-text">بروتين (دجاج/سمك مطهو جيداً/عدس) مع خضار وحبوب كاملة.</div></div><div class="card"><div class="card-title"><i class="fas fa-apple-whole"></i> وجبات خفيفة</div><div class="card-text">زبادي، تمر، مكسرات، فاكهة.</div></div><div class="card"><div class="card-title"><i class="fas fa-moon"></i> العشاء</div><div class="card-text">شوربة خضار وسلطة ولبن، وجبة خفيفة قبل النوم بساعتين.</div></div><div class="card"><div class="card-text">اشربي 8–10 أكواب ماء. تجنبي اللحوم والأسماك النيئة والحليب غير المبستر. اتبعي نصيحة طبيبك لاحتياجك الخاص.</div></div>';
+        R.size = () => { if (!S.done || S.mode === 'cycle' || stg() === 'post') return '<div class="card"><div class="card-text">أدخلي بيانات حملك من شاشة المتابعة أولاً.</div></div>'; const w = calc().w; return `<div class="card text-center"><div class="big">${w}</div><div class="card-text">أسبوع — حجم طفلك يقارب: <b>${szOf(w)[1]}</b></div></div><div class="card">${SZ.map(x => `<div class="row"><span>أسبوع ${x[0]}</span><span>${x[1]}</span></div>`).join('')}</div><div class="card"><div class="card-text">الأحجام تقريبية.</div></div>`; };
+        R.labor = () => '<div class="card"><div class="card-title"><i class="fas fa-hospital"></i> علامات المخاض</div><div class="card-text">• انقباضات منتظمة تزداد قوة وتقارباً<br>• نزول ماء الرأس<br>• نزول سدادة مخاطية مدممة</div></div><div class="card"><div class="card-title"><i class="fas fa-triangle-exclamation" style="color:#E53935"></i> توجهي للمستشفى فوراً عند</div><div class="card-text">نزيف، نزول الماء، انقباضات بقاعدة 5-1-1، أو نقص حركة الجنين.</div></div><button class="btn-primary" onclick="openTool(\'contr\')">مؤقت الانقباض</button><button class="btn-sec" onclick="openTool(\'bag\')">حقيبة المستشفى</button>';
+
+        // ----- blog -----
+        const ARTS = [
+            { c: 'rec', t: 'التعافي بعد الولادة', b: 'الراحة، السوائل، المشي الخفيف تدريجياً، وتمارين قاع الحوض بعد موافقة الطبيب. راجعي طبيبك عند نزيف غزير أو حمى أو ألم شديد.' },
+            { c: 'mood', t: 'اكتئاب ما بعد الولادة', b: 'الحزن الخفيف في أول أسبوعين شائع، لكن استمرار الحزن أو القلق أو فقدان الاهتمام أكثر من أسبوعين يستدعي استشارة مختصة. لستِ وحدك.' },
+            { c: 'self', t: 'وقت لكِ', b: 'خصصي 10 دقائق يومياً لنفسك: حمام دافئ أو مشي أو مكالمة صديقة، واطلبي من الأهل المساعدة في رعاية الطفل.' },
+            { c: 'baby', t: 'الرضاعة الطبيعية ورعاية المولود', b: 'أرضعي عند الطلب، وتأكدي من التحام الطفل بالثدي جيداً. عدد الحفاضات المبللة يساعد على معرفة كفاية الحليب.' },
+            { c: 'emo', t: 'تقلبات المزاج والرفاهية العاطفية', b: 'التغيرات الهرمونية تفسر جزءاً من تقلب المزاج. دوّني مشاعرك وتحدثي مع من تثقين به.' },
+            { c: 'sleep', t: 'النوم والطاقة', b: 'نامي عندما ينام طفلك، وتقاسمي ليالي الرعاية مع شريكك أو أحد أفراد الأسرة إن أمكن.' },
+            { c: 'nut', t: 'التغذية', b: 'وجبات صغيرة متكررة غنية بالحديد والكالسيوم والألياف مع ماء كافٍ. إنقاص الوزن بعد الولادة تدريجي وبعد استشارة الطبيب، خاصة أثناء الرضاعة.' },
+            { c: 'sym', t: 'أعراض الحمل الشائعة', b: 'الغثيان والتعب وتكرار التبول وألم الظهر شائعة. أما الصداع الشديد مع تورم مفاجئ أو زغللة، أو النزيف، فتستدعي مراجعة الطبيب فوراً.' },
+            { c: 'birth', t: 'الاستعداد للولادة', b: 'جهزي الحقيبة والأوراق ووسيلة النقل، وتعرفي على علامات المخاض ومتى تتوجهين للمستشفى.' },
+            { c: 'sup', t: 'دعم الحمل', b: 'المتابعة الطبية الدورية، حمض الفوليك، نوم كافٍ ونشاط خفيف بموافقة الطبيب.' },
+            { c: 'wk', t: 'نمو الجنين', b: 'تابعي نمو جنينك أسبوعاً بأسبوع من شاشة المتابعة وأداة حجم الطفل.' },
+            { c: 'help', t: 'كيف تدعمين الأم', b: 'استمعي دون أحكام، ساعدي في الأعمال المنزلية، وشجعيها على الراحة وزيارة الطبيب.' }
+        ];
+        let bf = 'mine';
+        function renderBlog() {
+            const mi = S.int || [], a = ARTS.filter(x => mi.includes(x.c)), l = bf === 'mine' && a.length ? a : ARTS;
+            $('blogBody').innerHTML = `<div class="chips"><span class="chip ${bf === 'mine' ? 'on' : ''}" onclick="bf='mine';renderBlog()"><i class="fas fa-wand-magic-sparkles"></i> مخصصة لكِ</span><span class="chip ${bf === 'all' ? 'on' : ''}" onclick="bf='all';renderBlog()">الكل</span></div>` +
+                l.map(x => `<div class="card"><div class="card-title"><i class="fas fa-book-open"></i>${x.t}</div><div class="card-text">${x.b}</div></div>`).join('') + '<div class="card-text" style="font-size:.7rem;color:#999">المحتوى للتثقيف فقط ولا يغني عن استشارة الطبيب.</div>';
+        }
+
+        // ----- hooks -----
+        const H = { onb: () => { S.method = S.method || 'lmp'; if (S.lmp) $('lmp').value = S.lmp; if (S.bdob) $('bdob').value = S.bdob; if (S.cyc) $('cyc').value = S.cyc; sync(); ob(0); }, pregnancy: renderPreg, blog: renderBlog };
+        const _g = goTo; goTo = function (s) { _g(s); if (H[s]) H[s](); $('sos').style.display = ['splash', 'lang', 'login', 'signup', 'emergency'].includes(s) ? 'none' : 'flex'; };
+
+        // ===== v3: account & profile =====
+        const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        async function doSignup() {
+            const g = id => $(id).value.trim(), m = t => showModal('تنبيه', t);
+            const name = g('fullname'), email = g('signupEmail').toLowerCase(), pass = nz($('signupPass').value);
+            if (!name || !email || !pass) return m('أدخلي الاسم والبريد وكلمة المرور');
+            if (!$('consent').checked) return m('يلزم الموافقة على معالجة بياناتك لإنشاء الحساب');
+            if (pass.length < 6) return m('كلمة المرور 6 أحرف على الأقل');
+            if (pass !== nz($('signupConfirm').value)) return m('كلمتا المرور غير متطابقتين');
+            ST('acc', { name, email, pass: await hp(pass), age: g('signupAge'), phone: g('signupPhone') });
+            S = {}; ST('s', S); applyLang();
+            goTo('login'); $('email').value = email; $('password').value = '';
+            showModal(STOK ? 'تم' : 'تنبيه', STOK ? 'تم إنشاء الحساب بنجاح سجّلي الدخول الآن' : 'تم إنشاء الحساب لكن المتصفح يمنع الحفظ الدائم؛ ستبقى البيانات حتى إغلاق الصفحة فقط. افتحي الملف من متصفح عادي أو من موقع.');
+        }
+        function logout() { ST('sess', null); goTo('login'); }
+        function renderRec() {
+            const a = ST('acc') || {}, b = $('recBody'), RL = { post: 'ما بعد الولادة', preg: 'حامل', hcp: 'أخصائية رعاية صحية', fam: 'صديق/عائلة' };
+            let h = `<div class="card"><div class="card-title"><i class="fas fa-user"></i> بياناتي</div><div class="card-text">الاسم: ${esc(a.name)}<br>البريد: ${esc(a.email)}${a.age ? '<br>العمر: ' + esc(a.age) : ''}${a.phone ? '<br>الهاتف: ' + esc(a.phone) : ''}</div></div>`;
+            if (S.done && S.lmp) {
+                let d = 'الحالة: ' + (S.mode === 'cycle' ? 'تتبع الدورة' : RL[S.role] || 'حامل') + '<br>آخر دورة: ' + fm(new Date(S.lmp + 'T00:00')) + '<br>طول الدورة: ' + (S.cyc || 28) + ' يوماً';
+                if (S.mode !== 'cycle') { const c = calc(); d += '<br>موعد الولادة المتوقع: ' + fm(c.due) + '<br>الأسبوع الحالي: ' + c.w; }
+                h += `<div class="card"><div class="card-title"><i class="fas fa-baby"></i> معلومات الحمل</div><div class="card-text">${d}</div></div>`;
+            }
+            const md = ST('meds') || [], nt = ST('notes') || [], w = ST('weight') || [];
+            h += `<div class="card"><div class="card-title"><i class="fas fa-pills"></i> الأدوية</div><div class="card-text">${md.map(x => esc(x.mt) + ' ' + esc(x.mn)).join('<br>') || 'لا شيء مضاف'}</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-pen"></i> الملاحظات</div><div class="card-text">${nt.map(x => esc(x.nd || x.d) + ': ' + esc(x.nt)).join('<br>') || 'لا ملاحظات'}</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-weight-scale"></i> آخر وزن</div><div class="card-text">${w.length ? esc(w[w.length - 1].w) + ' كغ' : 'لا قياسات'}</div></div>
+            <div class="card"><label class="radio-item"><input type="checkbox" ${S.share ? 'checked' : ''} onchange="S.share=this.checked;ST('s',S)"> أسمح للزوج/الأسرة بالاطلاع على معلوماتي الصحية</label></div>
+            <button class="btn-sec" onclick="goTo('onb')"><i class="fas fa-pen"></i> تعديل معلومات الحمل</button>
+            <button class="btn-sec" onclick="logout()"><i class="fas fa-right-from-bracket"></i> تسجيل الخروج</button>`;
+            b.innerHTML = h;
+        }
+        H.records = renderRec;
+
+        // ===== v4: stage-based home, mood check, appointments, breathing =====
+        const HS = {
+            plan: [["goTo('pregnancy')", 'fa-seedling', 'card-1', 'الدورة والخصوبة'], ["goTo('mood')", 'fa-heart', 'card-3', 'c3'], ["goTo('appointments')", 'fa-calendar-check', 'card-2', 'c2'], ["goTo('blog')", 'fa-book-open', 'card-4', 'c8'], ["goTo('tools')", 'fa-toolbox', 'card-5', 'c7'], ["goTo('tips')", 'fa-lightbulb', 'card-6', 'c4']],
+            preg: [["goTo('pregnancy')", 'fa-baby', 'card-1', 'c1'], ["goTo('mood')", 'fa-heart', 'card-3', 'c3'], ["goTo('appointments')", 'fa-calendar-check', 'card-2', 'c2'], ["goTo('tools')", 'fa-toolbox', 'card-5', 'c7'], ["goTo('blog')", 'fa-book-open', 'card-4', 'c8'], ["goTo('tips')", 'fa-lightbulb', 'card-6', 'c4']],
+            birth: [["openTool('labor')", 'fa-hospital', 'card-1', 'الاستعداد للولادة'], ["openTool('bag')", 'fa-suitcase-medical', 'card-5', 'حقيبة المستشفى'], ["goTo('pregnancy')", 'fa-baby', 'card-4', 'c1'], ["goTo('mood')", 'fa-heart', 'card-3', 'c3'], ["goTo('appointments')", 'fa-calendar-check', 'card-2', 'c2'], ["openTool('breath')", 'fa-wind', 'card-6', 'تمرين التنفس']],
+            post: [["goTo('pregnancy')", 'fa-baby-carriage', 'card-1', 'c5'], ["goTo('mood')", 'fa-heart', 'card-3', 'c3'], ["goTo('appointments')", 'fa-calendar-check', 'card-2', 'c2'], ["goTo('postpartum')", 'fa-hand-holding-heart', 'card-4', 'رعاية الطفل'], ["goTo('tools')", 'fa-toolbox', 'card-5', 'c7'], ["goTo('blog')", 'fa-book-open', 'card-6', 'c8']]
+        };
+        function renderHome() {
+            $('homeGrid').innerHTML = HS[stg()].map(([o, i, c, k]) => `<div class="card-home ${c}" onclick="${o}"><i class="fas ${i}"></i> <span ${T.ar[k] ? 'data-t="' + k + '"' : ''}>${T.ar[k] || k}</span></div>`).join('');
+        }
+
+        // ----- mood check -----
+        const MQ = ['شعرتُ بالحزن أو بكيتُ دون سبب واضح', 'فقدتُ الاستمتاع بما كنتُ أحبه', 'شعرتُ بقلق أو توتر شديد', 'واجهتُ صعوبة في النوم حتى عندما أتيحت لي الفرصة', 'شعرتُ بأنني عاجزة عن التأقلم مع الأمور', 'خطرت لي أفكار بإيذاء نفسي'];
+        const MO = ['أبداً', 'أحياناً', 'كثيراً', 'طوال الوقت'];
+        function renderMood() {
+            const h = (ST('mood') || []).slice(-5).reverse();
+            $('moodBody').innerHTML = `<div class="card"><div class="card-text">خلال الأسبوع الماضي… هذا مؤشر أولي وليس تشخيصاً.</div>${MQ.map((q, i) => `<div class="card-title">${q}</div><div class="chips">${MO.map((o, j) => `<span class="chip" data-q="${i}" data-v="${j}" onclick="mq(this)">${o}</span>`).join('')}</div>`).join('')}<button class="btn-primary" onclick="moodDone()">عرض النتيجة</button></div><div id="mres"></div>
+            <div class="card"><button class="btn-sec" onclick="openTool('breath')"><i class="fas fa-wind"></i> تمرين التنفس والاسترخاء</button><button class="btn-sec" onclick="openTool('sym')">تسجيل المزاج والأعراض اليومية</button></div>
+            ${h.map(x => `<div class="row"><span>${x.d}</span><span>المجموع: ${x.sc}/15</span></div>`).join('')}`;
+        }
+        function mq(el) { el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); el.classList.add('on'); }
+        function moodDone() {
+            const a = []; document.querySelectorAll('#moodBody .chip.on').forEach(c => a[+c.dataset.q] = +c.dataset.v);
+            if (Object.keys(a).length < 6) return showModal('تنبيه', 'أجيبي على كل الأسئلة');
+            const sc = a.slice(0, 5).reduce((x, y) => x + y, 0), self = a[5] > 0;
+            const msg = sc >= 10 ? 'المؤشرات مرتفعة. نوصيكِ بحجز جلسة مع الأخصائية النفسية قريباً.' : sc >= 5 ? 'هناك بعض المؤشرات. تحدثي مع مختصة إن استمرت أكثر من أسبوعين.' : 'المؤشرات مطمئنة. واصلي العناية بنفسك.';
+            const m = ST('mood') || []; m.push({ d: new Date().toLocaleDateString(), sc, self }); ST('mood', m);
+            $('mres').innerHTML = (self ? '<div class="card" style="border:2px solid #E53935"><div class="card-title" style="color:#E53935">أنتِ لستِ وحدكِ</div><div class="card-text">أفكار إيذاء النفس تحتاج دعماً عاجلاً. لا تبقي وحدكِ: تحدثي الآن مع شخص قريب، واتصلي بالطوارئ أو توجهي لأقرب مستعجلات.</div><button class="btn-primary" style="background:#E53935" onclick="goTo(\'emergency\')">الطوارئ والاتصال السريع</button></div>' : '') +
+                `<div class="card"><div class="card-title">النتيجة: ${sc} من 15</div><div class="card-text">${msg}</div>${sc >= 5 ? '<button class="btn-primary" onclick="apS.sp=\'psy\';goTo(\'appointments\')">حجز جلسة نفسية</button>' : ''}</div>`;
+            $('mres').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ----- breathing tool -----
+        R.breath = () => '<div class="card text-center"><div class="big" id="bt"><i class="fas fa-wind"></i></div><div class="card-text" id="bs">شهيق 4 ثوانٍ، حبس 4، زفير 6 (5 دورات)</div><button class="btn-primary" onclick="breath()">ابدئي</button></div>';
+        function breath() {
+            clearInterval(kg); let t = 0;
+            kg = setInterval(() => {
+                if (t >= 70) { clearInterval(kg); $('bt').innerHTML = '<i class="fas fa-leaf"></i>'; $('bs').textContent = 'أحسنتِ'; return; }
+                const s = t % 14, r = s < 4 ? ['شهيق', 4 - s] : s < 8 ? ['حبس', 8 - s] : ['زفير', 14 - s];
+                $('bt').textContent = r[1]; $('bs').textContent = r[0] + ' — دورة ' + (Math.floor(t / 14) + 1) + '/5'; t++;
+            }, 1000);
+        }
+
+        // ----- appointments -----
+        const SP = [['gyn', 'طبيبة النساء والتوليد'], ['psy', 'الأخصائية النفسية'], ['nut', 'أخصائية التغذية'], ['ped', 'طبيبة الأطفال'], ['mid', 'القابلة'], ['fit', 'مختصة النشاط البدني']];
+        const TY = [['onsite', 'حضوري'], ['video', 'مكالمة فيديو'], ['audio', 'استشارة صوتية'], ['chat', 'محادثة كتابية']];
+        let apS = { sp: 'psy', ty: 'video' };
+        function apSet(k, v) { apS.ad = $('ad').value; apS.at = $('at').value; apS[k] = v; renderAp(); }
+        function renderAp() {
+            const a = ST('appts') || [], nm = (L, k) => (L.find(x => x[0] === k) || [])[1];
+            $('apBody').innerHTML = `<div class="card"><div class="card-title">التخصص</div><div class="chips">${SP.map(([k, l]) => `<span class="chip ${apS.sp === k ? 'on' : ''}" onclick="apSet('sp','${k}')">${l}</span>`).join('')}</div>
+            <div class="card-title">نوع الموعد</div><div class="chips">${TY.map(([k, l]) => `<span class="chip ${apS.ty === k ? 'on' : ''}" onclick="apSet('ty','${k}')">${l}</span>`).join('')}</div>
+            <input type="date" id="ad" class="form-input" value="${apS.ad || ''}" min="${new Date().toISOString().slice(0, 10)}"><input type="time" id="at" class="form-input" value="${apS.at || ''}">
+            <button class="btn-primary" onclick="apBook()">تأكيد الحجز</button><div class="card-text" style="font-size:.7rem">الحجز تجريبي ومحفوظ على جهازك حتى ربط التطبيق بنظام العيادة.</div></div>
+            <div class="card"><div class="card-title">مواعيدي</div>${a.map((x, i) => `<div class="row"><span>${x.ad} ${x.at}</span><span>${nm(SP, x.sp)} • ${nm(TY, x.ty)}</span><span onclick="apDel(${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span></div>`).join('') || '<div class="card-text">لا مواعيد بعد</div>'}</div>`;
+        }
+        function apBook() {
+            const ad = $('ad').value, at = $('at').value; if (!ad || !at) return showModal('تنبيه', 'اختاري التاريخ والوقت');
+            const a = ST('appts') || []; a.push({ sp: apS.sp, ty: apS.ty, ad, at }); a.sort((x, y) => (x.ad + x.at).localeCompare(y.ad + y.at)); ST('appts', a);
+            apS.ad = apS.at = ''; renderAp(); showModal('تم', 'تم تسجيل موعدك');
+        }
+        function apDel(i) { const a = ST('appts') || []; a.splice(i, 1); ST('appts', a); renderAp(); }
+
+        H.home = renderHome; H.mood = renderMood; H.appointments = renderAp;
+
+        // ===== v5: owner requirements (sections, specialists, booking, chat, library, account, admin) =====
+        const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const nmL = (L, k) => (L.find(x => x[0] === k) || [])[1];
+        const tglA = (key, id, fn) => { let a = ST(key) || []; a = a.includes(id) ? a.filter(x => x !== id) : [...a, id]; ST(key, a); fn(); };
+        function pg(t, back, h) { $('pgT').textContent = t; $('pgBack').setAttribute('onclick', back || "goTo('home')"); $('pgBody').innerHTML = h; goTo('pg'); $('pgBody').scrollTop = 0; }
+
+        const SPD = {
+            gyn: { n: 'د. شنين صبرينة · ⁦Chenine Sabrina⁩', r: 'طبيبة أمراض النساء والتوليد', e: 'gyn', b: 'متابعة الحمل والولادة والحالات الخاصة كسكري الحمل وارتفاع الضغط وفقر الدم.', s: ['متابعة الحمل', 'الفحوصات', 'حمل عالي الخطورة'], h: ['09:00', '10:30', '14:00', '15:30'] },
+            mid: { n: 'مداني هدى · ⁦Madani Houda⁩', r: 'قابلة مؤهلة', e: 'mid', b: 'مرافقة الحمل والتحضير للولادة ودعم الرضاعة الطبيعية.', s: ['التحضير للولادة', 'الرضاعة', 'متابعة النفاس'], h: ['09:30', '11:00', '14:30'] },
+            psy: { n: 'أ. تابتي خولة · ⁦Tabti Khaoula⁩', r: 'أخصائية نفسانية', e: 'psy', b: 'دعم القلق والتوتر والاكتئاب المرتبط بالحمل والأمومة، حضورياً أو عن بُعد.', s: ['القلق والتوتر', 'ما بعد الولادة', 'الاسترخاء'], h: ['10:00', '11:30', '15:00', '16:30'] },
+            psy2: { n: 'أ. جدي جمعية · ⁦Djeddi Djemaia⁩', r: 'أخصائية نفسانية', e: 'psy2', b: 'مرافقة الأمهات نفسياً خلال الحمل وبعد الولادة، والدعم الأسري وإدارة الضغط النفسي، حضورياً أو عن بُعد.', s: ['الاكتئاب بعد الولادة', 'الدعم الأسري', 'إدارة الضغط'], h: ['09:00', '10:30', '14:30', '16:00'] },
+            nut: { n: 'أخصائي تغذية', r: '', e: 'nut', b: 'برامج غذائية لكل مرحلة، وسكري الحمل وفقر الدم والرضاعة.', s: ['تغذية الحامل', 'سكري الحمل', 'تغذية المرضعة'], h: ['09:00', '11:00', '14:00'] },
+            fit: { n: 'مختصة النشاط البدني والتأهيل بعد الولادة', r: '', e: 'fit', b: 'تمارين آمنة للحامل واستعادة اللياقة تدريجياً بعد الولادة.', s: ['تمارين الحمل', 'قاع الحوض', 'التأهيل'], h: ['08:30', '10:00', '16:00'] },
+            ped: { n: 'طبيب أطفال', r: '', e: 'ped', b: 'متابعة نمو الرضيع والتلقيحات والعلامات التي تستدعي المراجعة.', s: ['نمو الطفل', 'التلقيحات', 'العناية بالمولود'], h: ['09:00', '10:30', '14:00'] }
+        };
+        const SEC = {
+            plan: { t: 'التخطيط للحمل', i: 'fa-seedling', items: ['استشارات ما قبل الحمل', 'التوجيه الصحي والنفسي للاستعداد للحمل', 'الإرشاد التغذوي والاستعداد الجسدي', 'حجز موعد مع المختصين'], sp: ['gyn', 'nut', 'psy', 'psy2'], l: [['تتبع الدورة والخصوبة', "goTo(S.mode==='cycle'?'pregnancy':'onb')"], ['حجز استشارة ما قبل الحمل', "doc('gyn')"], ['مقالات للاستعداد للحمل', "lib('art')"]] },
+            prep: { t: 'التحضير للولادة', i: 'fa-person-pregnant', items: ['دورات التحضير النفسي والجسدي للولادة', 'تمارين التنفس والاسترخاء', 'تمارين مناسبة للحامل تحت إشراف مختص', 'التوعية بمراحل الولادة', 'فيديوهات تعليمية للتحضير للولادة'], sp: ['mid', 'fit', 'psy', 'psy2'], l: [['تمرين التنفس', "openTool('breath')"], ['علامات المخاض والولادة', "openTool('labor')"], ['مؤقت الانقباض', "openTool('contr')"], ['حقيبة المستشفى', "openTool('bag')"], ['فيديوهات التحضير', "lib('vid')"], ['الدورات والورشات', "lib('crs')"]] },
+            mind: { t: 'الصحة النفسية', i: 'fa-heart', items: ['حجز جلسات مع أخصائية نفسية', 'استشارات نفسية عن بُعد', 'متابعة القلق والتوتر والاكتئاب المرتبط بالحمل والأمومة', 'برامج الاسترخاء وإدارة الضغط', 'التوعية باكتئاب ما بعد الولادة وذهان النفاس', 'التوجيه إلى الجهات الصحية المختصة عند الأعراض الخطيرة'], w: 'هلوسات أو ارتباك شديد أو أفكار بإيذاء النفس أو الطفل أو العجز عن رعاية النفس والطفل: توجهي إلى الطوارئ فوراً ولا تبقي وحدك.', sp: ['psy', 'psy2'], l: [['فحص المزاج والقلق', "goTo('mood')"], ['تمرين التنفس والاسترخاء', "openTool('breath')"], ['تسجيل المزاج والأعراض', "openTool('sym')"], ['استشارة نفسية عن بُعد', "doc('psy')"]] },
+            nutr: { t: 'التغذية الصحية', i: 'fa-apple-whole', items: ['حجز استشارات مع أخصائي التغذية', 'إرشادات غذائية لكل مرحلة من الحمل', 'التغذية في سكري الحمل وفقر الدم', 'التغذية المناسبة خلال الرضاعة الطبيعية', 'الإرشادات الغذائية بعد الولادة'], sp: ['nut'], l: [['خطة الوجبات', "openTool('meal')"], ['تتبع الوزن', "openTool('weight')"], ['استشارة تغذية', "doc('nut')"]] },
+            recov: { t: 'التعافي بعد الولادة', i: 'fa-hand-holding-heart', items: ['متابعة التعافي الجسدي بعد الولادة', 'استعادة اللياقة البدنية تدريجياً وبأمان', 'تمارين مناسبة تحت إشراف مختص', 'إرشادات الراحة والنوم', 'المتابعة النفسية للأم بعد الولادة'], w: 'نزيف غزير، حمى، ألم شديد، أو احمرار وإفرازات من الجرح: راجعي الطبيبة فوراً.', sp: ['fit', 'gyn', 'psy', 'psy2'], l: [['تمرين كيجل', "openTool('kegel')"], ['فحص المزاج', "goTo('mood')"], ['حجز فحص ما بعد الولادة', "doc('gyn')"], ['برنامج التأهيل', "doc('fit')"]] },
+            baby: { t: 'الرضاعة والعناية بالمولود', i: 'fa-baby-carriage', items: ['إرشادات الرضاعة الطبيعية', 'المساعدة في صعوبات الرضاعة', 'استشارة مختصة بالرضاعة', 'العناية اليومية بالمولود واحتياجاته الأساسية', 'العلامات التي تستدعي استشارة طبيب الأطفال'], w: 'صعوبة في التنفس، حمى عند الرضيع، أو رفض الرضاعة بشكل مستمر: توجهي للطوارئ أو لطبيب الأطفال فوراً.', sp: ['ped', 'mid'], l: [['استشارة رضاعة', "doc('mid')"], ['استشارة طبيب الأطفال', "doc('ped')"], ['فيديوهات العناية بالمولود', "lib('vid')"]] }
+        };
+        const STG_SEC = { plan: 'plan', preg: 'preg', birth: 'prep', post: 'recov' };
+        const HSEC = [['plan', 'fa-seedling', 'التخطيط للحمل'], ['preg', 'fa-baby', 'متابعة الحمل'], ['prep', 'fa-person-pregnant', 'التحضير للولادة'], ['mind', 'fa-heart', 'الصحة النفسية'], ['nutr', 'fa-apple-whole', 'التغذية الصحية'], ['recov', 'fa-hand-holding-heart', 'التعافي بعد الولادة'], ['baby', 'fa-baby-carriage', 'الرضاعة والعناية بالمولود'], ['edu', 'fa-book-open', 'التوعية والتثقيف']];
+        function renderHome() {
+            const rec = STG_SEC[stg()];
+            $('homeGrid').innerHTML = HSEC.map(([k, i, l], j) => `<div class="card-home card-${j % 6 + 1}" style="${k === rec ? 'outline:3px solid #D37586' : ''}" onclick="${k === 'preg' ? "sec('preg')" : k === 'edu' ? "lib('art')" : "sec('" + k + "')"}"><i class="fas ${i}"></i> <span>${l}</span></div>`).join('') +
+                `<div class="card" style="grid-column:1/-1"><button class="btn-sec" onclick="docs()"><i class="fas fa-user-doctor"></i> تعرّفي على مختصينا</button><div class="card-text" style="text-align:center;font-size:.75rem;margin-top:6px">لَكِ... لأن بناء المجتمع يبدأ برعاية الأم والطفل.</div></div>`;
+            const n = nlist().length; $('nb').textContent = n || ''; $('nb').style.display = n ? 'block' : 'none';
+        }
+        function sec(k) {
+            LS = k; const s = SEC[k];
+            pg(s.t, "goTo('home')", `<div class="card"><div class="card-title"><i class="fas ${s.i}"></i> خدمات القسم</div>${s.items.map(itemRow).join('')}</div>
+            ${s.w ? `<div class="card" style="border:2px solid #E53935"><div class="card-title" style="color:#E53935">متى تطلبين مساعدة عاجلة</div><div class="card-text">${s.w}</div></div>` : ''}
+            <div class="card"><div class="card-title">أدوات وروابط</div>${s.l.map(([t, a]) => `<button class="btn-sec" onclick="${a}">${t}</button>`).join('')}</div>
+            <div class="card"><div class="card-title">المختصون</div>${s.sp.map(x => `<div class="row" style="cursor:pointer" onclick="doc('${x}')"><span>${dI(SPD[x].e, 22)}${SPD[x].n}</span><span>${SPD[x].r}</span></div>`).join('')}</div>`);
+        }
+
+        // ----- specialists & booking -----
+        function docs() {
+            pg('المختصون', "goTo('appointments')", Object.entries(SPD).map(([k, d]) => `<div class="card"><div style="display:flex;gap:10px;align-items:center"><div class="av">${dI(d.e)}</div><div><div class="card-title" style="margin:0">${d.n}</div><div class="card-text">${d.r}</div></div></div><div class="card-text">${d.b}</div><button class="btn-primary" onclick="doc('${k}')">المواعيد والحجز</button></div>`).join('') + '<div class="card-text" style="font-size:.7rem">الأسماء والصور تجريبية وتُستبدل ببيانات المختصين الفعليين.</div>');
+        }
+        let BK = {};
+        function slots(k) {
+            const taken = (ST('appts') || []).filter(a => a.sp === k && a.st !== 'x').map(a => a.ad + a.at), out = [];
+            if ((ST('spoff') || []).includes(k)) return out;
+            for (let i = 1; out.length < 5 && i < 21; i++) {
+                const d = new Date(+td() + i * D); if ([5, 6].includes(d.getDay())) continue;
+                const iso = isoD(d); out.push({ iso, times: SPD[k].h.filter(t => !taken.includes(iso + t)) });
+            }
+            return out;
+        }
+        function doc(k) { if (BK.sp !== k) BK = { sp: k, ty: 'onsite' }; drawDoc(); }
+        function drawDoc() {
+            const k = BK.sp, d = SPD[k], sl = slots(k), day = sl.find(x => x.iso === BK.ad);
+            pg(d.n, 'docs()', `<div class="card text-center"><div class="av" style="margin:auto;width:80px;height:80px;font-size:2.6rem">${dI(d.e)}</div><div class="card-title" style="justify-content:center">${d.n}</div><div class="card-text">${d.r}</div><div class="card-text">${d.b}</div><div class="chips" style="justify-content:center">${d.s.map(x => `<span class="chip">${x}</span>`).join('')}</div></div>
+            <div class="card"><div class="card-title">نوع الموعد</div><div class="chips">${TY.map(([a, l]) => `<span class="chip ${BK.ty === a ? 'on' : ''}" onclick="BK.ty='${a}';drawDoc()">${l}</span>`).join('')}</div>
+            <div class="card-title">اليوم</div><div class="chips">${sl.map(x => `<span class="chip ${BK.ad === x.iso ? 'on' : ''}" onclick="BK.ad='${x.iso}';BK.at='';drawDoc()">${new Date(x.iso + 'T00:00').toLocaleDateString('ar-DZ', { weekday: 'short', day: 'numeric', month: 'short' })}</span>`).join('') || '<div class="card-text">لا مواعيد متاحة حالياً</div>'}</div>
+            ${day ? `<div class="card-title">الساعة</div><div class="chips">${day.times.map(t => `<span class="chip ${BK.at === t ? 'on' : ''}" onclick="BK.at='${t}';drawDoc()">${t}</span>`).join('') || '<div class="card-text">محجوز بالكامل</div>'}</div>` : ''}
+            <button class="btn-primary" onclick="book()">تأكيد الحجز</button><button class="btn-sec" onclick="chat('${k}')"><i class="fas fa-comments"></i> راسلي المختص</button></div>`);
+        }
+        function book() {
+            if (!BK.ad || !BK.at) return showModal('تنبيه', 'اختاري اليوم والساعة');
+            const a = ST('appts') || []; a.push({ sp: BK.sp, ty: BK.ty, ad: BK.ad, at: BK.at, st: 'p' }); ST('appts', a); BK = {};
+            goTo('appointments'); showModal('تم', 'تم إرسال طلب الحجز سيصلكِ تأكيد من العيادة');
+        }
+        function renderAp() {
+            const a = ST('appts') || [], t = isoD(td()), up = [], past = [];
+            a.forEach((x, i) => ((x.ad >= t && x.st !== 'x') ? up : past).push([x, i]));
+            const card = ([x, i], isUp) => `<div class="card"><div class="card-title">${SPD[x.sp].n}</div><div class="card-text">${SPD[x.sp].r ? SPD[x.sp].r + ' • ' : ''}${nmL(TY, x.ty)}<br>${x.ad} • ${x.at} • ${x.st === 'x' ? 'ملغى' : x.st === 'ok' ? '<i class="fas fa-circle-check" style="color:#4CAF50"></i> مؤكد' : isUp ? '<i class="fas fa-hourglass-half"></i> بانتظار التأكيد' : 'منتهٍ'}</div>
+                ${isUp ? `${x.ty !== 'onsite' ? `<button class="btn-primary" onclick="startC(${i})">بدء الاستشارة</button>` : ''}<button class="btn-sec" onclick="apDel(${i})">إلغاء الموعد</button>` : x.st !== 'x' && !x.r ? `<button class="btn-sec" onclick="rate(${i})"><i class="fas fa-star"></i> تقييم الخدمة</button>` : x.r ? `<div class="card-text">تقييمك: ${'<i class="fas fa-star" style="color:#F4B942"></i>'.repeat(x.r)}</div>` : ''}</div>`;
+            $('apBody').innerHTML = `<button class="btn-primary" onclick="docs()">+ حجز موعد جديد</button><div class="card-title" style="margin-top:12px">المواعيد القادمة</div>${up.map(x => card(x, true)).join('') || '<div class="card-text">لا مواعيد قادمة</div>'}<div class="card-title" style="margin-top:12px">سجل المواعيد والاستشارات السابقة</div>${past.map(x => card(x, false)).join('') || '<div class="card-text">لا سجل بعد</div>'}`;
+        }
+        function apDel(i) { const a = ST('appts') || []; a[i].st = 'x'; ST('appts', a); renderAp(); }
+        function startC(i) { const x = (ST('appts') || [])[i]; if (x.ty === 'chat') chat(x.sp); else if (x.ty === 'video') goTo('videocall'); else showModal('استشارة صوتية', 'ستتصل بكِ العيادة هاتفياً في الموعد المحدد.'); }
+        let rt = 0;
+        function rate(i) { rt = 0; pg('تقييم الخدمة', "goTo('appointments')", `<div class="card"><div class="chips" id="stars">${[1, 2, 3, 4, 5].map(n => `<span class="chip" onclick="rt=${n};document.querySelectorAll('#stars .chip').forEach((c,j)=>c.classList.toggle('on',j<${n}))"><i class="fas fa-star"></i> ${n}</span>`).join('')}</div><textarea id="rc" class="form-input" placeholder="ملاحظاتك (اختياري)"></textarea><button class="btn-primary" onclick="saveRate(${i})">إرسال</button></div>`); }
+        function saveRate(i) { if (!rt) return showModal('تنبيه', 'اختاري عدد النجوم'); const a = ST('appts') || []; a[i].r = rt; ST('appts', a); const f = ST('fb') || []; f.push({ d: new Date().toLocaleDateString(), k: 'تقييم', r: rt, t: $('rc').value.trim(), sp: a[i].sp }); ST('fb', f); goTo('appointments'); showModal('شكراً', 'تم إرسال تقييمك'); }
+
+        // ----- messages & chat -----
+        function addMsg(k, f, t) { const c = ST('chat') || {}; (c[k] = c[k] || []).push({ f, t, ts: Date.now() }); ST('chat', c); if ($('cm') && $('cm').dataset.k === k) { $('cm').insertAdjacentHTML('beforeend', bub({ f, t })); } }
+        const bub = x => `<div style="display:flex;justify-content:${x.f === 'me' ? 'flex-start' : 'flex-end'};margin:4px 0"><div style="max-width:80%;padding:8px 12px;border-radius:14px;font-size:.8rem;background:${x.f === 'me' ? '#D37586' : '#F5E1E4'};color:${x.f === 'me' ? '#fff' : '#333'}">${esc(x.t)}</div></div>`;
+        function chat(k) {
+            const m = (ST('chat') || {})[k] || [];
+            pg(k === 'clinic' ? 'العيادة' : SPD[k].n, "goTo('msgs')", `<div class="card-text" style="font-size:.7rem"><i class="fas fa-lock"></i> المحادثة سرية بين المستفيدة والمختص. للحالات العاجلة استخدمي زر الطوارئ.</div><div id="cm" data-k="${k}">${m.map(bub).join('')}</div><input id="ci" class="form-input" placeholder="اكتبي رسالتك"><button class="btn-primary" onclick="send('${k}')">إرسال</button><label class="btn-sec" style="display:block;text-align:center"><i class="fas fa-paperclip"></i> إرسال تقرير أو تحليل<input type="file" hidden onchange="sendF('${k}',this)"></label>`);
+        }
+        function send(k) { const v = $('ci').value.trim(); if (!v) return; const first = !((ST('chat') || {})[k] || []).length; addMsg(k, 'me', v); $('ci').value = ''; if (first) setTimeout(() => addMsg(k, 'them', k === 'clinic' ? 'تم استلام استفسارك، وسيتواصل معكِ فريق العيادة قريباً.' : 'شكراً لرسالتك، سيرد عليكِ المختص خلال 24 ساعة.'), 1200); }
+        function sendF(k, el) { const f = el.files[0]; if (!f) return; addMsg(k, 'me', 'ملف مرفق: ' + f.name); const r = ST('reports') || []; r.push({ d: new Date().toLocaleDateString(), n: f.name }); ST('reports', r); }
+        function renderMsgs() {
+            const c = ST('chat') || {}, ks = ['clinic', ...Object.keys(SPD)];
+            $('msgBody').innerHTML = `<div class="card"><div class="card-title"><i class="fas fa-building"></i> استفسار للعيادة</div><div class="card-text">أرسلي سؤالك أو ملاحظتك لإدارة العيادة.</div><button class="btn-primary" onclick="chat('clinic')">إرسال استفسار</button></div>` +
+                ks.map(k => { const m = c[k] || [], l = m[m.length - 1]; return `<div class="card" style="cursor:pointer" onclick="chat('${k}')"><div class="card-title">${k === 'clinic' ? '<i class="fas fa-hospital"></i> العيادة' : SPD[k].e + ' ' + SPD[k].n}</div><div class="card-text">${l ? esc(l.t).slice(0, 60) : 'ابدئي محادثة'}</div></div>`; }).join('');
+        }
+
+        // ----- account -----
+        function renderRec() {
+            const a = ST('acc') || {};
+            $('recBody').innerHTML = `<div class="card text-center"><div class="av" style="margin:auto;font-size:1.6rem;color:#D37586"><i class="fas fa-user"></i></div><div class="card-title" style="justify-content:center">${esc(a.name)}</div><div class="card-text">${esc(a.email)}${a.phone ? '<br>' + esc(a.phone) : ''}</div></div><div class="card">` +
+                [['fa-file-medical', 'الملف الصحي', 'hf()'], ['fa-clock-rotate-left', 'سجل المتابعة', 'flog()'], ['fa-bell', 'الإشعارات والتذكيرات', 'notif()'], ['fa-crown', 'الاشتراكات والباقات', 'plans()'], ['fa-star', 'تقييم الخدمات والملاحظات', 'fb()'], ['fa-shield-halved', 'الخصوصية والموافقات', 'priv()'], ['fa-sliders', 'تغيير المرحلة / معلومات الحمل', "goTo('onb')"], ['fa-gauge', 'واجهة إدارة العيادة (نموذج)', "adm('ov')"]].map(([i, l, f]) => `<div class="row" style="cursor:pointer;padding:12px 0" onclick="${f}"><span><i class="fas ${i}" style="color:#D37586;width:24px"></i> ${l}</span><span>‹</span></div>`).join('') + `</div><button class="btn-sec" onclick="logout()">تسجيل الخروج</button>`;
+        }
+        function hf() {
+            const h = ST('hf') || {}, cs = h.c || [], rp = ST('reports') || [];
+            pg('الملف الصحي', "goTo('records')", `<div class="card"><div class="lbl">فصيلة الدم</div><select id="hb" class="form-input">${['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(x => `<option ${h.b === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
+            <div class="lbl">الحالات المرضية المسجلة</div><div class="chips" id="hc">${['سكري', 'ضغط الدم', 'الغدة الدرقية', 'فقر الدم', 'ربو', 'أخرى'].map(x => `<span class="chip ${cs.includes(x) ? 'on' : ''}" onclick="this.classList.toggle('on')">${x}</span>`).join('')}</div>
+            <input id="ha" class="form-input" placeholder="الحساسية" value="${esc(h.a)}"><input id="hp" type="number" class="form-input" placeholder="عدد الحمول السابقة" value="${esc(h.p)}"><input id="hl" type="number" class="form-input" placeholder="عدد الولادات السابقة" value="${esc(h.l)}">
+            <input id="he" class="form-input" placeholder="جهة اتصال للطوارئ (الاسم والهاتف)" value="${esc(h.e)}"><textarea id="hn" class="form-input" placeholder="ملاحظات صحية">${esc(h.n)}</textarea><button class="btn-primary" onclick="hfSave()">حفظ</button></div>
+            <div class="card"><div class="card-title">الأدوية والتقارير</div><button class="btn-sec" onclick="openTool('meds')">الأدوية المسجلة</button>${rp.map(x => `<div class="row"><span><i class="fas fa-paperclip"></i> ${esc(x.n)}</span><span>${x.d}</span></div>`).join('')}<label class="btn-sec" style="display:block;text-align:center">+ رفع تقرير أو تحليل<input type="file" hidden onchange="sendRep(this)"></label></div>`);
+        }
+        function hfSave() { ST('hf', { b: $('hb').value, a: $('ha').value, p: $('hp').value, l: $('hl').value, e: $('he').value, n: $('hn').value, c: [...document.querySelectorAll('#hc .on')].map(e => e.textContent) }); showModal('تم', 'تم حفظ ملفك الصحي'); }
+        function sendRep(el) { const f = el.files[0]; if (!f) return; const r = ST('reports') || []; r.push({ d: new Date().toLocaleDateString(), n: f.name }); ST('reports', r); hf(); }
+        function flog() {
+            const ap = ST('appts') || [], md = ST('mood') || [], w = ST('weight') || [], sy = ST('sym') || [], blk = (t, a) => `<div class="card"><div class="card-title">${t}</div>${a.slice(-5).reverse().join('') || '<div class="card-text">لا بيانات بعد</div>'}</div>`;
+            pg('سجل المتابعة', "goTo('records')", blk('المواعيد والاستشارات (' + ap.length + ')', ap.map(x => `<div class="row"><span>${x.ad}</span><span>${SPD[x.sp].r || SPD[x.sp].n}</span></div>`)) + blk('فحوصات المزاج', md.map(x => `<div class="row"><span>${x.d}</span><span>${x.sc}/15</span></div>`)) + blk('الوزن', w.map(x => `<div class="row"><span>${x.d}</span><span>${x.w} كغ</span></div>`)) + blk('الأعراض', sy.map(x => `<div class="row"><span>${x.d}</span><span>${esc(x.s.join('، ') || '—')}</span></div>`)));
+        }
+
+        // ----- notifications -----
+        const NC = [['ap', 'المواعيد والاستشارات'], ['med', 'الأدوية'], ['nut', 'التغذية وشرب الماء'], ['fit', 'التمارين'], ['grow', 'مراحل نمو الجنين'], ['kick', 'حركة الجنين'], ['pp', 'فحوصات ما بعد الولادة'], ['vac', 'التلقيحات']];
+        function nlist() {
+            const on = ST('nset') || {}, L = [], t = isoD(td()), lim = isoD(new Date(+td() + 7 * D));
+            (ST('appts') || []).filter(x => x.ad >= t && x.ad <= lim && x.st !== 'x').forEach(x => L.push({ k: 'ap', t: `موعد مع ${SPD[x.sp].n}: ${x.ad} ${x.at}` }));
+            (ST('meds') || []).forEach(x => L.push({ k: 'med', t: `تناولي ${x.mn}${x.mt ? ' الساعة ' + x.mt : ''}` }));
+            L.push({ k: 'nut', t: 'اشربي 8 أكواب من الماء اليوم' }, { k: 'fit', t: 'خصصي 10 دقائق للتنفس أو تمارين الاسترخاء' }, { k: 'ap', t: 'حان وقت فحص المزاج الأسبوعي' });
+            if (S.done && stg() !== 'plan' && stg() !== 'post') { const c = calc(); if (c.w >= 0 && c.w <= 42) { L.push({ k: 'grow', t: `الأسبوع ${c.w}: حجم الطفل يقارب ${szOf(c.w)[1]}` }); if (c.w >= 28) L.push({ k: 'kick', t: 'سجلي حركة الجنين اليوم' }); } }
+            if (stg() === 'post') L.push({ k: 'pp', t: 'لا تنسي فحص ما بعد الولادة مع الطبيبة' }, { k: 'vac', t: 'راجعي جدول تلقيحات طفلك مع طبيب الأطفال' });
+            return L.filter(x => on[x.k] !== false);
+        }
+        function notif() {
+            const on = ST('nset') || {};
+            pg('الإشعارات والتذكيرات', "goTo('home')", `<div class="card"><div class="card-title">اليوم</div>${nlist().map(x => `<div class="row"><span><i class="fas fa-bell"></i> ${esc(x.t)}</span></div>`).join('') || '<div class="card-text">لا إشعارات</div>'}</div><div class="card"><div class="card-title">تخصيص التذكيرات</div>${NC.map(([k, l]) => `<label class="radio-item" style="margin:6px 0"><input type="checkbox" ${on[k] !== false ? 'checked' : ''} onchange="const o=ST('nset')||{};o['${k}']=this.checked;ST('nset',o)"> ${l}</label>`).join('')}</div><div class="card-text" style="font-size:.7rem">في النسخة الكاملة تصلكِ هذه التذكيرات كإشعارات فورية على هاتفك.</div>`);
+        }
+
+        // ----- plans, feedback, privacy -----
+        const PL = [['basic', 'باقة المرافقة', ['محتوى توعوي وصحي حسب المرحلة', 'تذكيرات المواعيد', 'فحص المزاج الأسبوعي']], ['digital', 'باقة المتابعة الرقمية', ['كل مزايا المرافقة', 'استشارات عن بُعد (نصية/صوتية/فيديو)', 'متابعة الملف الصحي']], ['full', 'باقة الأمومة الشاملة', ['كل مزايا المتابعة الرقمية', 'متابعة نفسية وتغذوية وبدنية', 'دورات وورشات متخصصة', 'محتوى للزوج والأسرة']]];
+        function plans() {
+            const cur = ST('plan');
+            pg('الاشتراكات والباقات', "goTo('records')", PL.map(([k, n, f]) => `<div class="card" ${cur === k ? 'style="border:2px solid #D37586"' : ''}><div class="card-title"><i class="fas fa-crown"></i> ${n}</div>${f.map(x => `<div class="row"><span><i class="fas fa-check" style="color:#8FA89B"></i> ${x}</span></div>`).join('')}<div class="card-text">السعر: تحدده العيادة</div><button class="${cur === k ? 'btn-sec' : 'btn-primary'}" onclick="ST('plan','${k}');plans()">${cur === k ? 'باقتك الحالية' : 'اشتراك'}</button></div>`).join('') + '<div class="card-text" style="font-size:.7rem">الاشتراكات اختيارية، والدفع الإلكتروني يُربط في النسخة الكاملة.</div>');
+        }
+        let fk = 'اقتراح';
+        function fb() {
+            const f = ST('fb') || [];
+            pg('تقييم الخدمات والملاحظات', "goTo('records')", `<div class="card"><div class="chips">${['اقتراح', 'ملاحظة', 'شكوى'].map(x => `<span class="chip ${fk === x ? 'on' : ''}" onclick="fk='${x}';fb()">${x}</span>`).join('')}</div><textarea id="ft" class="form-input" placeholder="اكتبي هنا"></textarea><button class="btn-primary" onclick="fbSave()">إرسال للعيادة</button></div>${f.slice(-5).reverse().map(x => `<div class="card"><div class="card-title">${x.k} ${x.r ? '<i class="fas fa-star" style="color:#F4B942"></i>'.repeat(x.r) : ''}</div><div class="card-text">${esc(x.t)}<br><small>${x.d}</small></div></div>`).join('')}`);
+        }
+        function fbSave() { const t = $('ft').value.trim(); if (!t) return; const f = ST('fb') || []; f.push({ d: new Date().toLocaleDateString(), k: fk, t }); ST('fb', f); fb(); showModal('شكراً', 'تم إرسال ملاحظتك'); }
+        function priv() {
+            const o = ST('pv') || { d: true, s: false, r: true, x: false };
+            const row = (k, l) => `<label class="radio-item" style="margin:8px 0"><input type="checkbox" ${o[k] ? 'checked' : ''} onchange="const q=ST('pv')||{};q['${k}']=this.checked;ST('pv',q);${k === 's' ? 'S.share=this.checked;ST(\'s\',S)' : ''}"> ${l}</label>`;
+            pg('الخصوصية والموافقات', "goTo('records')", `<div class="card">${row('d', 'أوافق على استخدام بياناتي الصحية لتقديم الخدمة')}${row('s', 'أسمح للزوج/الأسرة بالاطلاع على معلوماتي')}${row('r', 'أوافق على إرسال التذكيرات')}${row('x', 'أوافق على نشر تجربتي بدون ذكر اسمي')}</div><div class="card"><div class="card-text">• معلوماتك الصحية لا تُتاح إلا للمختصين المخولين.<br>• المحادثات والاستشارات سرية.<br>• يمكنكِ تغيير موافقتك في أي وقت.</div></div>`);
+        }
+
+        // ----- library -----
+        const VID = [['تمارين التنفس أثناء المخاض', '6:20'], ['وضعيات الاسترخاء للحامل', '8:05'], ['مراحل الولادة الطبيعية', '10:12'], ['تمارين قاع الحوض بعد الولادة', '7:40'], ['وضعيات الرضاعة الصحيحة', '9:30'], ['استحمام المولود خطوة بخطوة', '6:50'], ['النوم الآمن للرضيع', '5:15'], ['اليقظة الذهنية للأم', '7:00']];
+        const CRS = [['دورة التحضير النفسي والجسدي للولادة', '4 حصص'], ['ورشة العناية بالمولود', 'حصة واحدة'], ['ورشة الرضاعة الطبيعية', 'حصة واحدة'], ['دورة إدارة الضغط والاسترخاء', '3 حصص'], ['لقاء توعوي للأمهات', 'شهري']];
+        const FAM = [['كيف تدعم الزوجة أثناء الحمل', 'استمع دون أحكام، شارك في المواعيد الطبية، وخفف عنها الأعباء المنزلية.'], ['دور الزوج أثناء الولادة', 'كن حاضراً وهادئاً، ذكّرها بالتنفس، وتعرّف مسبقاً على خطة الولادة.'], ['دعم الأم في النفاس', 'وفّر لها فرص النوم والراحة، وانتبه لعلامات الحزن أو القلق المستمر.'], ['فهم التغيرات النفسية والجسدية', 'التقلبات الهرمونية حقيقية؛ الصبر والتفهم يصنعان فرقاً كبيراً.'], ['المشاركة في رعاية المولود', 'تبديل الحفاضات والتهدئة والاستحمام مهام يمكن للأب مشاركتها.']];
+        function lib(tab) {
+            tab = tab || 'art';
+            const T2 = [['art', 'مقالات'], ['vid', 'فيديوهات'], ['crs', 'دورات وورشات'], ['fam', 'للأزواج والأسرة']], en = ST('enr') || [];
+            let b = '';
+            if (tab === 'art') b = [...ARTS, ...(ST('xart') || [])].map(x => `<div class="card"><div class="card-title"><i class="fas fa-book-open"></i>${esc(x.t)}</div><div class="card-text">${esc(x.b)}</div></div>`).join('') + '<div class="card-text" style="font-size:.7rem">المحتوى للتثقيف فقط ويُراجع من المختصين قبل النشر، ولا يغني عن استشارة الطبيب.</div>';
+            if (tab === 'vid') b = VID.map(([t, d]) => `<div class="card" style="cursor:pointer" onclick="showModal('فيديو تعليمي','سيُربط هذا الفيديو بمكتبة العيادة في النسخة الكاملة.')"><div style="display:flex;gap:10px;align-items:center"><div class="av" style="border-radius:12px;font-size:1.2rem;color:#D37586"><i class="fas fa-play"></i></div><div><div class="card-title" style="margin:0">${t}</div><div class="card-text">${d} دقيقة</div></div></div></div>`).join('');
+            if (tab === 'crs') b = CRS.map(([t, d]) => `<div class="card"><div class="card-title">${t}</div><div class="card-text">${d}</div><button class="${en.includes(t) ? 'btn-sec' : 'btn-primary'}" onclick="tglA('enr','${t}',()=>lib('crs'))">${en.includes(t) ? 'تم تسجيل اهتمامك' : 'سجلي اهتمامك'}</button></div>`).join('');
+            if (tab === 'fam') b = FAM.map(([t, d]) => `<div class="card"><div class="card-title"><i class="fas fa-people-roof"></i> ${t}</div><div class="card-text">${d}</div></div>`).join('');
+            pg('التوعية والتثقيف', "goTo('home')", `<div class="chips">${T2.map(([k, l]) => `<span class="chip ${tab === k ? 'on' : ''}" onclick="lib('${k}')">${l}</span>`).join('')}</div>` + b);
+        }
+
+        // ----- admin (prototype) -----
+        function adm(t) {
+            t = t || 'ov'; const a = ST('appts') || [], T3 = [['ov', 'نظرة عامة'], ['ap', 'المواعيد'], ['sp', 'المختصون'], ['ct', 'المحتوى'], ['sv', 'الخدمات']], fbs = ST('fb') || [], rs = fbs.filter(x => x.r);
+            let b = '';
+            if (t === 'ov') b = `<div class="card"><div class="row"><span>الحسابات</span><b>${ST('acc') ? 1 : 0}</b></div><div class="row"><span>مواعيد بانتظار التأكيد</span><b>${a.filter(x => x.st === 'p').length}</b></div><div class="row"><span>مواعيد مؤكدة</span><b>${a.filter(x => x.st === 'ok').length}</b></div><div class="row"><span>متوسط التقييم</span><b>${rs.length ? (rs.reduce((x, y) => x + y.r, 0) / rs.length).toFixed(1) : '—'}</b></div><div class="row"><span>ملاحظات وشكاوى</span><b>${fbs.filter(x => !x.r).length}</b></div><div class="row"><span>الاشتراك الحالي</span><b>${nmL(PL, ST('plan') || '') || '—'}</b></div></div>`;
+            if (t === 'ap') b = a.map((x, i) => `<div class="card"><div class="card-title">${SPD[x.sp].n}</div><div class="card-text">${x.ad} ${x.at} • ${nmL(TY, x.ty)} • ${x.st === 'ok' ? 'مؤكد' : x.st === 'x' ? 'ملغى' : 'بانتظار التأكيد'}</div><button class="btn-primary" onclick="admSet(${i},'ok')">تأكيد</button><button class="btn-sec" onclick="admSet(${i},'x')">إلغاء</button></div>`).join('') || '<div class="card-text">لا حجوزات</div>';
+            if (t === 'sp') b = Object.entries(SPD).map(([k, d]) => { const off = (ST('spoff') || []).includes(k); return `<div class="card"><div class="card-title">${dI(d.e, 24)}${d.n}</div><div class="card-text">${d.r}</div><button class="${off ? 'btn-primary' : 'btn-sec'}" onclick="tglA('spoff','${k}',()=>adm('sp'))">${off ? 'إعادة تفعيل المواعيد' : 'إيقاف المواعيد'}</button></div>`; }).join('');
+            if (t === 'ct') b = `<div class="card"><input id="xt" class="form-input" placeholder="عنوان المقال"><textarea id="xb" class="form-input" placeholder="النص"></textarea><button class="btn-primary" onclick="xAdd()">نشر في المكتبة</button></div>` + (ST('xart') || []).map((x, i) => `<div class="row"><span>${esc(x.t)}</span><span onclick="xDel(${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span></div>`).join('');
+            if (t === 'sv') b = '<div class="card">' + ['التخطيط للحمل', 'متابعة الحمل', 'التحضير للولادة', 'الصحة النفسية', 'التغذية الصحية', 'التعافي بعد الولادة', 'الرضاعة والعناية بالمولود', 'التوعية والتثقيف'].map(x => `<label class="radio-item" style="margin:6px 0"><input type="checkbox" ${(ST('svoff') || []).includes(x) ? '' : 'checked'} onchange="tglA('svoff','${x}',()=>{})"> ${x}</label>`).join('') + '</div>';
+            pg('إدارة العيادة (نموذج)', "goTo('records')", `<div class="chips">${T3.map(([k, l]) => `<span class="chip ${t === k ? 'on' : ''}" onclick="adm('${k}')">${l}</span>`).join('')}</div>${b}<div class="card-text" style="font-size:.7rem">نموذج توضيحي لواجهة الإدارة، يقرأ البيانات من هذا الجهاز فقط.</div>`);
+        }
+        function admSet(i, v) { const a = ST('appts') || []; a[i].st = v; ST('appts', a); adm('ap'); }
+        function xAdd() { const t = $('xt').value.trim(), b = $('xb').value.trim(); if (!t || !b) return; const x = ST('xart') || []; x.push({ t, b }); ST('xart', x); adm('ct'); }
+        function xDel(i) { const x = ST('xart') || []; x.splice(i, 1); ST('xart', x); adm('ct'); }
+
+        H.msgs = renderMsgs; H.home = renderHome; H.records = renderRec; H.appointments = renderAp;
+        applyLang();
+
+        // ===== v6: doctor avatars (inline SVG illustrations) =====
+        const AV = {
+            gyn: { sk: '#F1C9A5', hj: '#6C8EBF', f: 1, st: 1 }, mid: { sk: '#E8B98F', hj: '#D37586', f: 1, st: 1 },
+            psy2: { sk: '#E8B98F', hj: '#9C7BB8', f: 1, st: 0 }, psy: { sk: '#F6D3B3', hr: '#5B3A29', f: 1, c: '#E6D4F2' }, nut: { sk: '#D9A87C', hr: '#2B2118', gl: 1, c: '#DCEBFA' },
+            fit: { sk: '#E8B98F', hj: '#8FA89B', f: 1, c: '#8EC5C0' }, ped: { sk: '#F1C9A5', hr: '#3A2A1E', bd: 1, st: 1 }
+        };
+        function dI(k, sz) {
+            const a = AV[k] || AV.gyn, sk = a.sk, dk = '#2B2118';
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FDE2E8"/><stop offset="1" stop-color="#DCEBFA"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/>`
+                + (a.hj ? `<path d="M26 52Q24 18 50 18Q76 18 74 52Q74 72 64 80L36 80Q26 72 26 52Z" fill="${a.hj}"/>` : a.f ? `<path d="M28 50Q26 20 50 20Q74 20 72 50L75 74L25 74Z" fill="${a.hr}"/>` : '')
+                + `<rect x="43" y="58" width="14" height="20" fill="${sk}"/>`
+                + (a.hj ? `<path d="M20 100Q22 70 50 68Q78 70 80 100Z" fill="${a.hj}"/>` : '')
+                + `<path d="M13 100Q15 77 40 73L50 86L60 73Q85 77 87 100Z" fill="${a.c || '#fff'}" stroke="#DDE3EC" stroke-width="1"/>`
+                + (a.c ? '' : `<path d="M40 73L50 86L60 73Q50 78 40 73Z" fill="#8EC5C0"/>`)
+                + (a.st ? `<path d="M37 77Q32 93 48 95M63 77Q68 93 52 95" stroke="#6B7280" stroke-width="2" fill="none"/><circle cx="50" cy="96" r="3" fill="#9CA3AF"/>` : '')
+                + (a.hj ? '' : `<circle cx="35" cy="47" r="3" fill="${sk}"/><circle cx="65" cy="47" r="3" fill="${sk}"/>`)
+                + `<ellipse cx="50" cy="46" rx="15" ry="18" fill="${sk}"/>`
+                + (a.bd ? `<path d="M35 50Q36 67 50 68Q64 67 65 50Q60 61 50 61Q40 61 35 50Z" fill="${a.hr}"/>` : '')
+                + (a.hj ? `<path d="M34 48Q32 24 50 24Q68 24 66 48Q66 31 50 31Q34 31 34 48Z" fill="${a.hj}"/>` : a.hr ? `<path d="M34 43Q33 25 50 25Q67 25 66 43Q62 33 50 33Q38 33 34 43Z" fill="${a.hr}"/>` : '')
+                + `<circle cx="44" cy="45" r="1.8" fill="${dk}"/><circle cx="56" cy="45" r="1.8" fill="${dk}"/><path d="M40.5 41Q44 39.5 47 41M53 41Q56 39.5 59.5 41" stroke="${dk}" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M50 47Q48.5 51 51 52" stroke="#00000033" stroke-width="1" fill="none"/><path d="M45 55.5Q50 59.5 55 55.5" stroke="#B5524F" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="40.5" cy="52" r="3" fill="#F29A9A" opacity=".35"/><circle cx="59.5" cy="52" r="3" fill="#F29A9A" opacity=".35"/>`
+                + (a.gl ? `<circle cx="44" cy="45" r="5" fill="none" stroke="#333" stroke-width="1.2"/><circle cx="56" cy="45" r="5" fill="none" stroke="#333" stroke-width="1.2"/><path d="M49 45h2" stroke="#333" stroke-width="1.2"/>` : '') + `</svg>`;
+            const st = sz ? `width:${sz}px;height:${sz}px;vertical-align:middle;margin-inline-end:6px;` : 'width:100%;height:100%;';
+            return `<img alt="" src="data:image/svg+xml;utf8,${encodeURIComponent(svg)}" style="${st}border-radius:50%;object-fit:cover">`;
+        }
+
+        // ===== v6: persistent session, hashed password, export/delete =====
+        async function hp(p) { try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lk:' + p)); return 'h:' + [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); } catch (e) { return p; } }
+        function exportData() {
+            const o = {}; Object.keys(localStorage).filter(k => k.startsWith('lk_') && k !== 'lk_acc' && k !== 'lk_sess').forEach(k => { try { o[k.slice(3)] = JSON.parse(localStorage.getItem(k)); } catch (e) { } });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2)], { type: 'application/json' })); a.download = 'lak-my-data.json'; a.click();
+        }
+        function delAcc() {
+            if (!confirm('سيتم حذف حسابك وكل بياناتك نهائياً من هذا الجهاز. هل أنتِ متأكدة؟')) return;
+            Object.keys(localStorage).filter(k => k.startsWith('lk_')).forEach(k => localStorage.removeItem(k)); location.reload();
+        }
+        const _priv = priv; priv = function () { _priv(); $('pgBody').insertAdjacentHTML('beforeend', '<button class="btn-sec" onclick="exportData()"><i class="fas fa-download"></i> تنزيل نسخة من بياناتي</button><button class="btn-sec" style="color:#E53935;border-color:#E53935" onclick="delAcc()"><i class="fas fa-trash"></i> حذف حسابي وكل بياناتي</button>'); };
+                // ===== v7: detailed medical content (topics, weekly tracking, high-risk, baby hub, labs, birth plan) =====
+        let LS = '';
+        const TP = {};
+        const tp = (k, t, sc, b, a) => TP[k] = { t, sc, b, a: a || [] };
+        const SCL = { plan: 'التخطيط للحمل', preg: 'متابعة الحمل', prep: 'التحضير للولادة', mind: 'الصحة النفسية', nutr: 'التغذية الصحية', recov: 'التعافي بعد الولادة', baby: 'الرضاعة والعناية بالمولود', par: 'التربية والرعاية المبكرة' };
+        const curW = () => { try { return S.done && S.mode !== 'cycle' && stg() !== 'post' ? Math.max(4, Math.min(40, calc().w)) : 12; } catch (e) { return 12; } };
+
+        // --- planning ---
+        tp('pre_consult', 'استشارات ما قبل الحمل', 'plan', [
+            ['ماذا تشمل الزيارة', 'مراجعة التاريخ الطبي والجراحي والأدوية الحالية|قياس الضغط والوزن وحساب مؤشر كتلة الجسم|مراجعة التلقيحات والفحص السريري حسب تقدير الطبيبة|الحديث عن نمط الحياة والتغذية والصحة النفسية'],
+            ['فحوصات تناقشينها مع الطبيبة', 'فصيلة الدم والعامل الريزيسي|تحليل الدم (فقر الدم) والسكر|وظائف الغدة الدرقية عند الحاجة|فحوصات العدوى والمناعة (كالحصبة الألمانية) وفق تقدير الطبيبة|فحص عنق الرحم إن كان موعده مستحقاً'],
+            ['متى تستشيرين مبكراً', 'أمراض مزمنة (سكري، ضغط، غدة درقية، صرع...)|إجهاضات متكررة أو حمل سابق بمضاعفات|عمر 35 سنة فأكثر|عدم حدوث الحمل بعد 12 شهراً من المحاولة (6 أشهر إن كان العمر 35 فأكثر)']], [['حجز موعد مع طبيبة النساء', "doc('gyn')"]]);
+        tp('pre_health', 'التوجيه الصحي والنفسي للاستعداد للحمل', 'plan', [
+            ['الاستعداد الصحي', 'تناول حمض الفوليك قبل الحمل بشهر على الأقل بجرعة تحددها الطبيبة (الشائعة 400 ميكروغرام يومياً)|التوقف عن التدخين والكحول وتجنب التدخين السلبي|عدم إيقاف أدوية مزمنة أو تغيير جرعتها دون استشارة الطبيبة|تحديث التلقيحات اللازمة قبل الحمل|ضبط الأمراض المزمنة قبل الحمل'],
+            ['الاستعداد النفسي', 'تحدثي مع الشريك عن التوقعات والأدوار ومسؤوليات الأسرة|التوتر الشديد يؤثر على النوم والصحة، فخصصي وقتاً للراحة والتنفس|إن سبق لك قلق أو اكتئاب فاستشيري الأخصائية النفسية قبل الحمل|عبّري عن مخاوفك من الحمل والولادة بصراحة']], [['حجز مع الأخصائية النفسية', "doc('psy')"]]);
+        tp('pre_nut', 'الإرشاد التغذوي والاستعداد الجسدي', 'plan', [
+            ['التغذية', 'نظام متنوع: خضار وفواكه وحبوب كاملة وبقوليات وبروتين وألبان|مصادر الحديد والكالسيوم والفولات (ورقيات، عدس، حمص، بيض، ألبان)|الحد من الكافيين (أقل من 200 ملغ يومياً، نحو كوب قهوة كبير (350 مل))|تقليل السكريات المصنعة والمقليات'],
+            ['الاستعداد الجسدي', 'الوصول إلى وزن صحي قبل الحمل تدريجياً|نشاط بدني معتدل نحو 150 دقيقة أسبوعياً (مشي، سباحة)|نوم منتظم من 7 إلى 9 ساعات']], [['حجز مع أخصائي التغذية', "doc('nut')"]]);
+        tp('fertility', 'الإباضة والخصوبة والصحة الإنجابية', 'plan', [
+            ['الإباضة ونافذة الخصوبة', 'تحدث الإباضة غالباً قبل نحو 14 يوماً من الدورة القادمة|نافذة الخصوبة: 5 أيام قبل الإباضة ويوم الإباضة|تعيش الحيوانات المنوية حتى 5 أيام والبويضة نحو 24 ساعة'],
+            ['علامات الإباضة', 'إفرازات شفافة لزجة تشبه بياض البيض|ألم خفيف في أحد جانبي أسفل البطن عند بعض النساء|ارتفاع طفيف في الحرارة القاعدية بعد الإباضة (0.3 إلى 0.5 درجة)|اختبارات الإباضة المنزلية'],
+            ['تذكري', 'الدورات غير المنتظمة تجعل التقدير أصعب، فاستشيري الطبيبة|الحساب في التطبيق تقديري ولا يصلح وسيلة لمنع الحمل']]);
+
+        // --- pregnancy: exercise + high risk ---
+        tp('ex_preg', 'تمارين مناسبة للحامل', 'preg', [
+            ['قبل البدء', 'احصلي على موافقة الطبيبة، خاصة في الحمل عالي الخطورة|الهدف نحو 150 دقيقة أسبوعياً من نشاط معتدل|الاعتدال: يجب أن تستطيعي الحديث أثناء التمرين'],
+            ['حسب المرحلة', 'الثلث الأول: مشي، سباحة، تنفس، تمارين قاع الحوض|الثلث الثاني: يوغا الحمل، تمارين الحوض، تقوية خفيفة|الثلث الثالث: مشي خفيف، كرة الولادة، تمارين الاسترخاء والتنفس، القرفصاء المسنود'],
+            ['تمارين مفيدة', 'إمالة الحوض لتخفيف ألم الظهر|وضعية القط والبقرة|تقوية قاع الحوض (كيجل)|تمدد الصدر والكتفين|التنفس العميق'],
+            ['تخفيف آلام الظهر', 'نامي على الجانب مع وسادة بين الركبتين|حرارة دافئة موضعية|تجنبي الوقوف أو الجلوس الطويل'],
+            ['أوقفي التمرين فوراً واتصلي بالطبيبة عند', 'نزيف أو نزول سوائل|دوخة أو إغماء أو ألم في الصدر|انقباضات منتظمة مؤلمة|ألم أو تورم في الساق|ضيق نفس قبل بذل الجهد', 1],
+            ['تجنبي', 'الرياضات الملامسة وخطر السقوط|الغوص|اليوغا الساخنة|الاستلقاء المسطح على الظهر طويلاً بعد الأسبوع 20']], [['تمرين كيجل', "openTool('kegel')"], ['فيديوهات التمارين', "lib('vid')"], ['حجز مع مختصة النشاط البدني', "doc('fit')"]]);
+        tp('hr_dm', 'سكري الحمل', 'preg', [
+            ['ما هو', 'اضطراب في تنظيم السكر يظهر غالباً بين الأسبوعين 24 و28|يُشخَّص بتحميل السكر بإشراف الطبيبة'],
+            ['المتابعة', 'قياس السكر صائماً وبعد الوجبات حسب توجيه الطبيبة|الأهداف الشائعة: صائم أقل من 95 ملغ/دل، بعد ساعة أقل من 140، بعد ساعتين أقل من 120 (تحددها الطبيبة)|تغذية متوازنة ومشي بعد الوجبات إن سمحت الطبيبة|قد تلزم أدوية أو إنسولين بوصفة طبية'],
+            ['اتصلي بالطبيبة عند', 'قراءات مرتفعة متكررة|عطش شديد وتبول كثير وتشوش الرؤية|قيء مستمر أو عدم القدرة على الأكل', 1]], [['تسجيل القياسات', 'hr()'], ['التغذية في سكري الحمل', "topic('nut_dm')"]]);
+        tp('hr_htn', 'ارتفاع ضغط الدم وتسمم الحمل', 'preg', [
+            ['الأنواع', 'ارتفاع الضغط المزمن قبل الحمل|ارتفاع الضغط الحملي بعد الأسبوع 20|تسمم الحمل: ارتفاع الضغط مع بروتين في البول أو علامات تأثر الأعضاء'],
+            ['المتابعة', 'قياس الضغط منزلياً بجهاز معتمد وتسجيله|زيارات متقاربة وتحاليل بوصفة الطبيبة|لا توقفي أو تغيّري دواء الضغط دون استشارتها'],
+            ['توجهي للطوارئ فوراً عند', 'ضغط 160/110 فأكثر أو ارتفاع مع أعراض|صداع شديد لا يزول أو زغللة أو رؤية أضواء|ألم في أعلى البطن تحت الأضلاع|تورم مفاجئ في الوجه واليدين وضيق نفس|تشنجات', 1]], [['تسجيل القياسات', 'hr()']]);
+        tp('hr_anem', 'فقر الدم أثناء الحمل', 'preg', [
+            ['ما هو', 'نقص الهيموغلوبين غالباً بسبب نقص الحديد، ويسبب تعباً ودواراً وشحوباً'],
+            ['العلاج والمتابعة', 'تحليل دم دوري|مكملات الحديد بجرعة وبوصفة الطبيبة|غذاء غني بالحديد مع فيتامين C|تجنب الشاي والقهوة مع الوجبات'],
+            ['راجعي الطبيبة بسرعة عند', 'دوخة شديدة أو إغماء|خفقان وضيق نفس|شحوب شديد وتعب لا يُحتمل', 1]], [['التغذية في فقر الدم', "topic('nut_dm')"]]);
+        tp('hr_twin', 'الحمل المتعدد', 'preg', [
+            ['الخصوصيات', 'زيارات وفحوص موجات أكثر لمتابعة نمو الجنينين|احتياج أكبر للسعرات والحديد والفولات|احتمال ولادة أبكر، وتحدد الطبيبة التوقيت الأنسب'],
+            ['انتبهي إلى', 'انقباضات منتظمة مبكرة|ألم أو ضغط في الحوض|نزول سوائل أو نزيف|تورم أو صداع شديد', 1]]);
+        tp('hr_thy', 'اضطرابات الغدة الدرقية', 'preg', [
+            ['المتابعة', 'قياس TSH دورياً بحسب الطبيبة|الاستمرار على دواء الغدة بانتظام وعدم إيقافه|أخذ الدواء بعيداً بساعات عن الحديد والكالسيوم حسب توجيه الطبيبة'],
+            ['انتبهي إلى', 'خفقان شديد وتعرق ورجفة|تعب شديد وبرودة وإمساك|أي تغير مفاجئ ناقشيه مع الطبيبة', 1]]);
+        tp('hr_chr', 'الأمراض المزمنة المصاحبة للحمل', 'preg', [
+            ['قواعد عامة', 'تحتاجين متابعة مشتركة بين طبيبة التوليد وطبيب الاختصاص|راجعي أدويتك مع الطبيبة فبعضها يُعدّل أو يُستبدل|احملي تقاريرك وتحاليلك في كل زيارة وارفعيها في ملفك الصحي|سجلي القياسات الدورية']], [['التحاليل والتقارير', 'labs()']]);
+
+        // --- birth prep ---
+        tp('lab_stages', 'مراحل الولادة الطبيعية', 'prep', [
+            ['المرحلة الأولى: الانفتاح', 'المبكرة: انقباضات خفيفة متباعدة ويتلين عنق الرحم|النشطة: انقباضات أقوى وأقرب وينفتح العنق من 6 سم|الانتقالية: أصعبها وأقصرها حتى الانفتاح الكامل 10 سم'],
+            ['المرحلة الثانية: الدفع', 'الدفع مع الانقباضات حتى خروج الطفل|قد تدوم دقائق إلى ساعات|اتبعي توجيهات القابلة'],
+            ['المرحلة الثالثة: خروج المشيمة', 'تخرج المشيمة خلال دقائق إلى نحو نصف ساعة بعد الولادة|تتابع الطبيبة النزيف'],
+            ['بعد الولادة', 'تلامس الجلد للجلد والرضاعة الأولى|مراقبة الأم والمولود لساعات'],
+            ['ملاحظة', 'مدة المخاض تختلف كثيراً بين النساء وبين الحمل الأول والتالي']]);
+        tp('cs', 'الولادة القيصرية والفرق بينها وبين الطبيعية', 'prep', [
+            ['الولادة القيصرية', 'عملية جراحية يولد فيها الطفل عبر شق في البطن والرحم|مبرمجة مسبقاً أو طارئة|دواعٍ شائعة: وضعية مقعدية، مشيمة سابقة، قيصرية سابقة، ضائقة جنينية، تعثر المخاض'],
+            ['الفرق بين الطبيعية والقيصرية', 'الطبيعية: تعافٍ أسرع غالباً وإقامة أقصر|القيصرية: جراحة بطنية وإقامة 2 إلى 4 أيام وتعافٍ من 6 إلى 8 أسابيع|لكل منهما فوائد ومخاطر، والقرار يعود لحالتك مع طبيبتك'],
+            ['التعافي بعد القيصرية', 'المشي المبكر والتنفس العميق|دعم الجرح بوسادة عند السعال|تجنب حمل الأثقال نحو 6 أسابيع|مراقبة الجرح والحمى']], [['التعافي بعد الولادة', "topic('rec_body')"]]);
+        tp('lab_signs', 'علامات المخاض ومتى تتوجهين للمستشفى', 'prep', [
+            ['علامات اقتراب المخاض', 'انقباضات منتظمة تزداد قوة وتقارباً|نزول مخاط مدمم (السدادة المخاطية)|نزول ماء الرأس|هبوط البطن وزيادة ضغط الحوض'],
+            ['توجهي إلى المستشفى عند', 'انقباضات كل 5 دقائق أو أقل تدوم نحو دقيقة ولمدة ساعة (قاعدة 5-1-1)|نزول الماء حتى دون ألم|نزيف مهبلي|نقص واضح في حركة الجنين|سائل أخضر أو بني|ألم شديد مستمر|إن كنتِ بعيدة عن المستشفى أو حملك عالي الخطورة فتوجهي أبكر', 1]], [['مؤقت الانقباض', "openTool('contr')"], ['حقيبة المستشفى', "openTool('bag')"]]);
+        tp('lab_pain', 'التعامل مع آلام المخاض وتنفس الولادة', 'prep', [
+            ['وسائل التخفيف', 'التنفس البطيء العميق مع الانقباض|تغيير الوضعيات والمشي وكرة الولادة|الاستحمام الدافئ والتدليك|وجود مرافق داعم|الموسيقى والتركيز'],
+            ['وسائل طبية', 'مسكنات أو تخدير فوق الجافية حسب رغبتك والتقييم الطبي|ناقشي الخيارات مع الطبيبة وضمّنيها في خطة الولادة'],
+            ['تنفس المخاض', 'شهيق عبر الأنف 4 ثوانٍ ثم زفير بطيء عبر الفم 6 ثوانٍ|عند ذروة الانقباض تنفسي أبطأ وأعمق|لا تحبسي نفسك']], [['تمرين التنفس', "openTool('breath')"]]);
+        tp('lab_fear', 'التهيئة النفسية وتقليل الخوف من الولادة', 'prep', [
+            ['تقليل الخوف', 'المعرفة تقلل القلق فاحضري دورات التحضير|اطلعي على مراحل الولادة والإجراءات|زوري المستشفى مسبقاً|تحدثي عن مخاوفك مع طبيبتك أو القابلة|اختاري مرافقاً داعماً'],
+            ['تمارين نفسية', 'التنفس 4-4-6|التخيل الإيجابي لسير الولادة|الاسترخاء العضلي التدريجي'],
+            ['اطلبي دعماً نفسياً عند', 'خوف شديد يمنع النوم أو الأكل|ذكريات مؤلمة من ولادة سابقة|نوبات هلع', 1]], [['حجز مع الأخصائية النفسية', "doc('psy')"]]);
+        tp('lab_proc', 'الإجراءات الطبية أثناء الولادة', 'prep', [
+            ['إجراءات شائعة', 'مراقبة نبض الجنين والانقباضات|فحوص مهبلية لمتابعة الانفتاح|قسطرة وريدية|تحفيز المخاض أو تسريعه عند الحاجة|بضع الفرج عند الضرورة فقط|دواء بعد الولادة لتقليل النزيف'],
+            ['للمولود', 'تلامس الجلد للجلد|قطع الحبل السري بعد لحظات|فيتامين K وفحوص الوليد'],
+            ['حقوقك', 'اسألي عن سبب كل إجراء وبدائله|اطلبي شرحاً واضحاً|عبّري عن تفضيلاتك مسبقاً']]);
+        tp('lab_bf', 'الرضاعة الطبيعية المبكرة', 'prep', [
+            ['الساعة الأولى', 'تلامس الجلد للجلد والرضاعة في الساعة الأولى بعد الولادة|اللبأ (الحليب الأول) غني بالمناعة رغم قلة كميته|اطلبي مساعدة القابلة في وضعية الالتقام']], [['إرشادات الرضاعة', "topic('bf_basic')"]]);
+
+        // --- mental health ---
+        tp('anx', 'القلق والتوتر والاكتئاب أثناء الحمل والأمومة', 'mind', [
+            ['مدى الانتشار', 'نحو 10% من الحوامل و13% من النساء بعد الولادة يعانين اضطراباً نفسياً (منظمة الصحة العالمية)|الأمر شائع وقابل للعلاج'],
+            ['علامات تستدعي الانتباه', 'حزن أو بكاء متكرر أو فقدان المتعة لأكثر من أسبوعين|قلق مستمر وأفكار سلبية أو خوف مبالغ|اضطراب النوم والشهية|نوبات هلع|عزلة وشعور بالذنب أو عدم الكفاءة'],
+            ['ما يساعد', 'الحديث مع شخص تثقين به|نوم وراحة ونشاط خفيف|تمارين التنفس والاسترخاء|جلسات مع أخصائية نفسية'],
+            ['أفكار إيذاء النفس', 'إن راودتك أفكار بإيذاء نفسك فتوجهي إلى الطوارئ فوراً ولا تبقي وحدك', 1]], [['فحص المزاج', "goTo('mood')"], ['حجز مع الأخصائية النفسية', "doc('psy')"]]);
+        tp('relax', 'برامج الاسترخاء وإدارة الضغط النفسي', 'mind', [
+            ['الاسترخاء العضلي التدريجي (10 دقائق)', 'اجلسي أو استلقي في مكان هادئ|شدّي عضلات القدمين 5 ثوانٍ ثم أرخي|انتقلي تدريجياً: الساقان، البطن، الذراعان، الكتفان، الوجه|تنفسي ببطء طوال التمرين'],
+            ['اليقظة الذهنية 5-4-3-2-1', 'سمّي 5 أشياء ترينها|4 أشياء تلمسينها|3 أصوات تسمعينها|شيئين تشمينهما|شيئاً واحداً تتذوقينه'],
+            ['إدارة الضغط', 'حددي أولوياتك وفوّضي بعض المهام|روتين نوم ثابت وتقليل الشاشات قبل النوم|مشي يومي قصير|وقت لنفسك']], [['تمرين التنفس الموجّه', "openTool('breath')"]]);
+        tp('ppd', 'اكتئاب ما بعد الولادة وقلقها وذهان النفاس', 'mind', [
+            ['الحزن العابر (Baby blues)', 'يظهر في الأيام الأولى وحتى أسبوعين: بكاء وتقلب مزاج وقلق خفيف|يزول غالباً بالراحة والدعم'],
+            ['اكتئاب ما بعد الولادة', 'حزن شديد أو فراغ مستمر لأكثر من أسبوعين|فقدان الاهتمام بالطفل أو بنفسك|شعور بالذنب أو العجز|اضطراب شديد في النوم والشهية|صعوبة التركيز|قد يظهر خلال السنة الأولى وهو قابل للعلاج'],
+            ['قلق ما بعد الولادة', 'قلق مفرط على صحة الطفل|وساوس وأفكار متكررة|خفقان وصعوبة في الاسترخاء'],
+            ['ذهان النفاس: حالة طارئة نادرة', 'يبدأ غالباً خلال أول أسبوعين بعد الولادة|هلوسات أو أوهام أو ارتباك شديد|أرق شديد وتقلبات حادة وسلوك غريب|أفكار بإيذاء النفس أو الطفل|توجهي إلى المستعجلات فوراً أو اتصلي بالطوارئ ولا تتركيها وحدها', 1]], [['فحص المزاج', "goTo('mood')"], ['حجز مع الأخصائية النفسية', "doc('psy')"]]);
+        tp('refer', 'التوجيه إلى الجهات الصحية عند الأعراض الخطيرة', 'mind', [
+            ['ماذا تفعلين عند الأعراض الخطيرة', 'أفكار بإيذاء نفسك أو طفلك|هلوسات أو ارتباك أو عجز عن رعاية نفسك أو الطفل|اتصلي بالطوارئ أو توجهي لأقرب مستعجلات فوراً|اطلبي من شخص قريب البقاء معك|أبعدي أي أدوات قد تؤذي', 1],
+            ['بعد الاستقرار', 'تواصلي مع الأخصائية النفسية أو الطبيبة|أبلغي أسرتك بخطة الدعم|التطبيق ليس بديلاً عن الطوارئ أو التقييم الطبي المباشر']], [['الطوارئ والاتصال السريع', "goTo('emergency')"], ['حجز مع الأخصائية النفسية', "doc('psy')"]]);
+
+        // --- nutrition ---
+        tp('nut_stage', 'الإرشادات الغذائية لكل مرحلة من الحمل', 'nutr', [
+            ['السعرات والوزن', 'الثلث الأول: لا زيادة في السعرات غالباً|الثلث الثاني: نحو 340 سعرة إضافية يومياً|الثلث الثالث: نحو 450 سعرة إضافية يومياً|الزيادة الإجمالية المعتادة 11 إلى 16 كغ عند الوزن الطبيعي قبل الحمل، وتحددها الطبيبة'],
+            ['العناصر المهمة', 'الفولات (ورقيات، بقوليات)|الحديد (لحم أحمر، عدس، سبانخ مع فيتامين C)|الكالسيوم (ألبان، سردين بالعظم)|أوميغا 3 (سمك قليل الزئبق مرتين أسبوعياً)|اليود والكولين (بيض، ألبان)|الألياف والماء (8 إلى 10 أكواب)'],
+            ['وجبات يومية مقترحة', 'الفطور: شوفان بالحليب والفاكهة أو بيض وخبز كامل|الغداء: بروتين (دجاج أو سمك مطبوخ جيداً أو عدس) مع خضار وحبوب كاملة|العشاء: شوربة خضار وسلطة ولبن|وجبات خفيفة: تمر، مكسرات، زبادي، فاكهة'],
+            ['وصفات سريعة', 'عصيدة الشوفان: شوفان وحليب وتمر وقرفة|سلطة العدس: عدس مسلوق وطماطم وبقدونس وزيت زيتون|شوربة خضار بالحمص: جزر وكوسة وحمص وكمون'],
+            ['أطعمة تتجنبينها أو تحذرين منها', 'اللحوم والأسماك والبيض النيئة أو غير المطبوخة جيداً|الحليب والأجبان غير المبسترة|أسماك عالية الزئبق (القرش، أبو سيف)|الكبد بكميات كبيرة|الكحول نهائياً|الكافيين أكثر من 200 ملغ يومياً|اغسلي الخضار والفواكه جيداً', 1]], [['حجز مع أخصائي التغذية', "doc('nut')"], ['خطة الوجبات', "openTool('meal')"], ['تتبع الوزن', "openTool('weight')"]]);
+        tp('nut_dm', 'التغذية في سكري الحمل وفقر الدم وارتفاع الضغط', 'nutr', [
+            ['سكري الحمل', '3 وجبات رئيسية و2 إلى 3 وجبات خفيفة بمواعيد منتظمة|توزيع الكربوهيدرات على اليوم وعدم إهمال وجبة|كربوهيدرات بطيئة الامتصاص: حبوب كاملة وبقوليات وخضار|مشروبات بلا سكر وعصائر محدودة|مشي 10 إلى 15 دقيقة بعد الوجبات إن سمحت الطبيبة'],
+            ['فقر الدم', 'الحديد مع فيتامين C (ليمون، فلفل)|تجنبي الشاي والقهوة مع الوجبة|مكملات الحديد بوصفة الطبيبة|الكبد باعتدال'],
+            ['ارتفاع ضغط الدم', 'تقليل الملح والأطعمة المصنعة|الإكثار من الخضار والفواكه والماء|الالتزام بعلاج الطبيبة وقياس الضغط'],
+            ['تذكري', 'اتبعي برنامجاً فردياً من أخصائية التغذية وتوجيهات طبيبتك']], [['حجز مع أخصائي التغذية', "doc('nut')"], ['تسجيل القياسات', 'hr()']]);
+        tp('nut_bf', 'التغذية المناسبة خلال الرضاعة الطبيعية', 'nutr', [
+            ['الاحتياج', 'نحو 330 إلى 400 سعرة إضافية يومياً|ماء كافٍ (اشربي عند العطش)|مصادر بروتين وكالسيوم وحديد'],
+            ['تنبيهات', 'الكافيين باعتدال|الكحول غير موصى به|تجنبي الحميات القاسية، وإنقاص الوزن يكون تدريجياً بعد استقرار الرضاعة'],
+            ['أفكار وجبات', 'فطور غني بالبروتين (بيض، لبن، شوفان)|وجبات خفيفة: مكسرات وتمر وحليب|خضار وبقوليات وحبوب كاملة يومياً']], [['حجز مع أخصائي التغذية', "doc('nut')"]]);
+        tp('nut_pp', 'الإرشادات الغذائية بعد الولادة', 'nutr', [
+            ['بعد الولادة', 'وجبات صغيرة منتظمة|بروتين وحديد لتعويض فقد الدم|سوائل وألياف للوقاية من الإمساك|المكملات (حديد، فيتامينات) بتوجيه الطبيبة'],
+            ['المتابعة', 'تحليل فقر الدم عند التعب الشديد|وزن يُنقَص تدريجياً (نحو نصف كغ أسبوعياً كحد أقصى أثناء الرضاعة)|زيارة أخصائية التغذية لبرنامج فردي']], [['حجز مع أخصائي التغذية', "doc('nut')"]]);
+
+        // --- recovery ---
+        tp('rec_body', 'متابعة التعافي الجسدي بعد الولادة', 'recov', [
+            ['النزيف والتغيرات', 'نزيف النفاس يمتد من 4 إلى 6 أسابيع ويقل تدريجياً ويتغير لونه|استعملي فوطاً نسائية ولا تستعملي السدادات|تقلصات الرحم الخفيفة طبيعية خاصة مع الرضاعة'],
+            ['الجرح', 'القيصرية: نظفي الجرح وجففيه وراقبيه|العجان: غسل بماء دافئ وتجفيف لطيف وكمادات باردة|تجنبي الإمساك والإجهاد'],
+            ['الألم والتعب والهرمونات', 'آلام الظهر والحوض شائعة: حرارة لطيفة ووضعيات مريحة|التعب طبيعي فارتاحي عند نوم الطفل|تساقط الشعر والتعرق الليلي مؤقتان'],
+            ['النظافة والعناية الشخصية', 'نظافة يومية بالماء والصابون الخفيف|ملابس قطنية مريحة|الفوط النسائية تُغيّر بانتظام'],
+            ['فحص ما بعد الولادة', 'تواصل مع الطبيبة خلال أول 3 أسابيع وفحص شامل بين 4 و12 أسبوعاً (غالباً عند 6 أسابيع)|إن أصبتِ بارتفاع ضغط أثناء الحمل: فحص الضغط خلال 7 إلى 10 أيام من الولادة|احجزي موعد المتابعة من شاشة المواعيد'],
+            ['راجعي الطبيبة فوراً عند', 'نزيف غزير (فوطة كاملة كل ساعة) أو جلطات كبيرة|حمى 38 درجة فأكثر|ألم شديد أو إفرازات كريهة|احمرار أو تورم الجرح|ألم أو تورم في الساق أو ضيق نفس|صداع شديد أو زغللة|حزن شديد أو أفكار بإيذاء النفس', 1]], [['حجز فحص ما بعد الولادة', "doc('gyn')"]]);
+        tp('rec_ex', 'استعادة اللياقة البدنية تدريجياً وبأمان', 'recov', [
+            ['الأسابيع 0 إلى 6', 'مشي خفيف تدريجي|تنفس الحجاب الحاجز|تمارين قاع الحوض (كيجل)|انقباضات لطيفة لعضلات البطن العميقة|بعد القيصرية ابدئي أبطأ وبموافقة الطبيبة'],
+            ['بعد فحص الطبيبة', 'تقوية تدريجية للبطن والظهر والأرداف|سباحة ومشي أسرع|تجنبي رفع الأثقال والقفز حتى يُسمح لك'],
+            ['العودة للتمارين القوية', 'غالباً بعد نحو 12 أسبوعاً وبعد تقييم قاع الحوض|توقفي عند تسرب البول أو ثقل في الحوض|عند انفصال عضلات البطن اطلبي تقييم المختصة'],
+            ['قاعدة ذهبية', 'تقدمي ببطء واستمعي لجسدك واستشيري المختصة']], [['تمرين كيجل', "openTool('kegel')"], ['حجز مع مختصة التأهيل', "doc('fit')"]]);
+        tp('rec_sleep', 'إرشادات الراحة والنوم بعد الولادة', 'recov', [
+            ['النوم والراحة', 'نامي عندما ينام الطفل|اقتسمي الرعاية الليلية مع الزوج أو الأسرة|قللي الزيارات في الأسابيع الأولى|جرّبي الرضاعة مستلقية لتستريحي'],
+            ['الطاقة والمزاج', 'وجبات منتظمة وماء|شمس وحركة خفيفة|قلة النوم الشديدة تؤثر على المزاج فاطلبي المساعدة']], [['فحص المزاج', "goTo('mood')"]]);
+
+        // --- breastfeeding & baby ---
+        tp('bf_basic', 'إرشادات الرضاعة الطبيعية', 'baby', [
+            ['الفوائد', 'تغذية كاملة ومناعة للطفل|تقلل بعض المخاطر الصحية للأم|تقوي الرابطة بين الأم والطفل'],
+            ['الوضعية والالتقام الصحيح', 'فم الطفل واسع يغطي الحلمة وجزءاً كبيراً من الهالة|ذقنه ملاصق للثدي وأنفه حر|بطنه لبطنك ورأسه وجسمه على خط واحد|وضعيات: المهد، المهد المتقاطع، تحت الذراع، الاستلقاء الجانبي'],
+            ['علامات كفاية الحليب', '8 إلى 12 رضعة كل 24 ساعة|بعد اليوم الخامس 6 حفاضات مبللة فأكثر وبراز أصفر|بلع مسموع واسترخاء الطفل بعد الرضعة|زيادة تدريجية في الوزن'],
+            ['نصائح', 'ابدئي الرضاعة في الساعة الأولى|أرضعي عند الطلب|اشربي الماء وتغذي جيداً وارتاحي']], [['استشارة رضاعة', "doc('mid')"]]);
+        tp('bf_prob', 'صعوبات الرضاعة وعلاجها', 'baby', [
+            ['تشقق الحلمات', 'غالباً بسبب التحام غير صحيح فصححي الوضعية|ضعي قطرات من حليبك واتركيها تجف|استشيري مختصة الرضاعة'],
+            ['احتقان الثدي', 'أرضعي كثيراً وأفرغي الثدي|كمادات دافئة قبل الرضاعة وباردة بعدها|تدليك لطيف'],
+            ['قلة الحليب', 'زيدي عدد الرضعات وتفريغ الثدي|ماء وتغذية جيدة وراحة|تأكدي من الالتحام وراجعي المختصة إن لم يزد وزن الطفل'],
+            ['راجعي المختصة أو الطبيبة عند', 'احمرار وألم وسخونة في الثدي مع حمى (التهاب الثدي)، واستمري في تفريغ الثدي|ألم شديد مستمر|وزن الطفل لا يزيد أو يرفض الثدي', 1]], [['استشارة رضاعة', "doc('mid')"]]);
+        tp('bf_pump', 'شفط الحليب وتخزينه', 'baby', [
+            ['الشفط', 'اغسلي يديك وعقمي الأدوات|ابدئي بتدليك الثدي|اشفطي كل 3 ساعات إن كنتِ بعيدة عن الطفل'],
+            ['التخزين (إرشادات عامة)', 'حرارة الغرفة: حتى 4 ساعات|الثلاجة: حتى 4 أيام|المجمد: الأفضل خلال 6 أشهر ويمكن حتى 12|اكتبي التاريخ على الكيس'],
+            ['الإذابة والتقديم', 'أذيبي في الثلاجة أو تحت ماء دافئ|لا تستعملي الميكروويف|تخلصي من الحليب المتبقي بعد الرضعة']]);
+        tp('nb_care', 'العناية اليومية بالمولود واحتياجاته الأساسية', 'baby', [
+            ['الاستحمام والنظافة', 'إسفنجة بماء دافئ حتى سقوط الحبل السري ثم حمام بماء دافئ|لا تتركي الرضيع وحده لحظة في الماء|جففي الطيات جيداً (الرقبة والفخذين)'],
+            ['الحبل السري', 'حافظي عليه نظيفاً وجافاً ومكشوفاً للهواء|يسقط عادة خلال 1 إلى 3 أسابيع|راجعي الطبيب عند احمرار أو إفرازات كريهة أو نزف'],
+            ['تغيير الحفاضات', 'غيّري كل 2 إلى 3 ساعات أو عند الاتساخ|نظّفي من الأمام للخلف عند البنات|كريم واقٍ عند الاحمرار'],
+            ['تنظيم الرضاعة', 'من 8 إلى 12 رضعة يومياً في الأسابيع الأولى|أيقظيه للرضاعة إن نام طويلاً حتى يستعيد وزن الولادة'],
+            ['النوم الآمن', 'على الظهر دائماً|سطح مستوٍ وصلب دون وسائد أو بطانيات ثقيلة أو ألعاب|في غرفة الأم وسرير منفصل أول 6 أشهر'],
+            ['متابعة الوزن والطول', 'يفقد المولود حتى 7 إلى 10% من وزنه في الأيام الأولى ويستعيده بنحو أسبوعين|سجلي القياسات في صفحة طفلي ونموه']], [['طفلي ونموه', 'babyHub()'], ['استشارة طبيب الأطفال', "doc('ped')"]]);
+        tp('nb_signs', 'العلامات التي تستدعي استشارة طبيب الأطفال', 'baby', [
+            ['توجهي لطبيب الأطفال أو الطوارئ فوراً عند', 'حرارة 38 درجة فأكثر عند طفل أقل من 3 أشهر|صعوبة في التنفس أو أزيز أو ازرقاق الشفتين|رفض الرضاعة المستمر أو قيء أخضر متكرر|خمول شديد وصعوبة الإيقاظ|يرقان شديد أو يمتد للبطن والساقين|أقل من 6 حفاضات مبللة يومياً بعد اليوم الخامس|تشنجات', 1],
+            ['راجعي الطبيب قريباً عند', 'احمرار أو إفرازات حول الحبل السري|طفح جلدي منتشر|إسهال أو إمساك شديد|بكاء غير معتاد']], [['استشارة طبيب الأطفال', "doc('ped')"]]);
+
+        // --- early parenting ---
+        tp('par_cry', 'التعامل مع بكاء الرضيع', 'par', [
+            ['أسباب شائعة', 'جوع|حفاض مبلل أو متسخ|نعاس وتعب|غازات أو مغص|حر أو برد|حاجة للقرب والحضن'],
+            ['ما يهدئه', 'حمله والتمايل الهادئ|قماط خفيف آمن أو ضمة قريبة|صوت منتظم هادئ|رضاعة وتجشؤ|تغيير الجو والإضاءة'],
+            ['خذي استراحة', 'إن شعرتِ بالغضب أو الإرهاق ضعي الرضيع في سريره الآمن وابتعدي دقائق|لا تهزي الرضيع أبداً فالهز العنيف يسبب إصابة خطيرة بالدماغ|اطلبي مساعدة الزوج أو الأسرة', 1],
+            ['استشيري الطبيب عند', 'بكاء غير معتاد لا يهدأ لساعات|بكاء مع حمى أو قيء أو خمول|رفض الرضاعة']], [['استشارة طبيب الأطفال', "doc('ped')"]]);
+        tp('par_bond', 'بناء علاقة آمنة بين الأم والطفل', 'par', [
+            ['علاقة آمنة', 'تلامس الجلد للجلد والحضن المتكرر|الاستجابة لبكاء الطفل بهدوء وسرعة|التحدث إليه والنظر في عينيه|روتين ثابت للرضاعة والنوم'],
+            ['أهمية التفاعل', 'الكلام والغناء واللعب تنمّي الدماغ واللغة|قراءة قصيرة يومية منذ الأشهر الأولى|الاستجابة لنظراته وأصواته تبني الأمان العاطفي']]);
+        tp('par_play', 'أنشطة مناسبة لكل مرحلة عمرية وتنمية الحواس', 'par', [
+            ['حسب العمر', '0 إلى 3 أشهر: وقت على البطن بإشراف، وجوه وأضواء وأصوات هادئة|3 إلى 6 أشهر: ألعاب ملموسة ومرايا وأشياء للإمساك|6 إلى 9 أشهر: لعبة الغميضة وصناديق وأصوات|9 إلى 12 شهراً: كرات ومكعبات وكتب مصورة|12 إلى 24 شهراً: بناء ورسم وكتب ولعب تمثيلي'],
+            ['تنمية الحواس', 'ملمس مختلف (قماش ناعم وخشن)|موسيقى هادئة|ألوان وتباين قوي للرضع الصغار'],
+            ['سلامة', 'تجنبي القطع الصغيرة التي قد تُبتلع|أشرفي دائماً على اللعب']]);
+        tp('par_sleep', 'التعامل مع اضطرابات نوم الرضيع', 'par', [
+            ['عن نوم الرضيع', 'حديث الولادة ينام نحو 14 إلى 17 ساعة موزعة على فترات قصيرة|الاستيقاظ الليلي للرضاعة طبيعي في الأشهر الأولى|روتين ثابت: استحمام ثم رضاعة ثم إضاءة خافتة ثم النوم|ضعيه في سريره نعساناً لا نائماً بعد عمر عدة أشهر'],
+            ['النوم الآمن', 'على الظهر دائماً|سطح مستوٍ وصلب دون وسائد أو بطانيات أو ألعاب|في غرفة الأم وسرير منفصل أول 6 أشهر|حرارة معتدلة دون إفراط في التغطية']]);
+        tp('par_delay', 'مؤشرات التأخر النمائي ومتى تستشيرين المختص', 'par', [
+            ['مؤشرات تستدعي التقييم', 'لا يستجيب للأصوات أو الأضواء|لا يتابع الوجوه بالنظر بعد الشهرين|لا يبتسم اجتماعياً بعد 3 أشهر|لا يجلس دون دعم بعد 9 أشهر|لا ينطق مقاطع بعد 12 شهراً|فقدان مهارة اكتسبها سابقاً', 1],
+            ['ماذا تفعلين', 'الأطفال يتفاوتون لكن التقييم المبكر يفيد|اعرضي طفلك على طبيب الأطفال مع تسجيل ملاحظاتك|التدخل المبكر يحسّن النتائج']], [['استشارة طبيب الأطفال', "doc('ped')"]]);
+
+        // --- topic engine ---
+        function topic(k, back) {
+            const x = TP[k]; if (!x) return;
+            pg(x.t, back || (LS ? `sec('${LS}')` : 'topics()'),
+                x.b.map(([h, l, w]) => `<div class="card"${w ? ' style="border:2px solid #E53935"' : ''}><div class="card-title"${w ? ' style="color:#E53935"' : ''}>${w ? '<i class="fas fa-triangle-exclamation"></i> ' : ''}${h}</div>${l.split('|').map(a => `<div class="row"><span>• ${a}</span></div>`).join('')}</div>`).join('') +
+                (x.a.length ? `<div class="card"><div class="card-title">إجراءات</div>${x.a.map(([t, j]) => `<button class="btn-sec" onclick="${j}">${t}</button>`).join('')}</div>` : '') +
+                moreCard(k) + '<div class="card-text" style="font-size:.7rem">المحتوى للتثقيف العام ولا يغني عن استشارة الطبيبة أو المختص.</div>');
+        }
+        function topicList(q) {
+            q = (q || '').trim(); const ico = { plan: 'fa-seedling', preg: 'fa-person-pregnant', prep: 'fa-hospital', mind: 'fa-heart', nutr: 'fa-bowl-food', recov: 'fa-hand-holding-heart', baby: 'fa-baby', par: 'fa-child-reaching' };
+            const h = Object.entries(SCL).map(([sc, n]) => {
+                const it = Object.entries(TP).filter(([k, x]) => x.sc === sc && (!q || x.t.includes(q) || x.b.some(([a, l]) => a.includes(q) || l.includes(q))));
+                if (!it.length) return '';
+                return `<div class="card"><div class="card-title"><i class="fas ${ico[sc]}"></i> ${n}<span style="margin-inline-start:auto;font-size:.7rem;color:#999">${it.length}</span></div>${it.map(([k, x]) => `<div class="row" style="cursor:pointer" onclick="topic('${k}')"><span>${x.t}</span><i class="fas fa-chevron-left" style="color:#D37586"></i></div>`).join('')}</div>`;
+            }).join('');
+            return h || '<div class="card"><div class="card-text">لا توجد نتائج مطابقة.</div></div>';
+        }
+        function topicsQ(v) { $('tl').innerHTML = topicList(v); }
+        function topics() {
+            LS = '';
+            pg('المواضيع الطبية', "goTo('home')", `<input id="tq" class="form-input" placeholder="ابحثي في المواضيع الطبية" oninput="topicsQ(this.value)"><button class="btn-primary" style="margin-bottom:10px" onclick="weekPage(curW())"><i class="fas fa-calendar-week"></i> نمو الجنين أسبوعاً بأسبوع</button><div id="tl">${topicList('')}</div>`);
+        }
+
+        // --- weekly pregnancy tracking ---
+        const FR = ['بذرة خشخاش', 'بذرة تفاح', 'عدسة', 'توتة', 'توت العليق', 'حبة عنب', 'فراولة', 'تينة', 'ليمونة صغيرة', 'خوخة صغيرة', 'ليمونة', 'تفاحة صغيرة', 'أفوكادو', 'رمانة', 'فلفل رومي', 'مانجو', 'موزة', 'جزرة كبيرة', 'بابايا', 'غريب فروت', 'كوز ذرة', 'لفتة', 'خسة صغيرة', 'قرنبيط', 'باذنجانة', 'قرعة صغيرة', 'ملفوف', 'جوز هند', 'قرعة كبيرة', 'أناناس', 'شمام صغير', 'شمامة', 'خس روماني', 'سلق', 'كراث', 'بطيخة صغيرة', 'يقطينة صغيرة'];
+        const WL = [0.1, 0.3, 0.6, 1.0, 1.6, 2.3, 3.1, 4.1, 5.4, 7.4, 8.7, 10.1, 11.6, 13, 14.2, 15.3, 25.6, 26.7, 27.8, 28.9, 30, 34.6, 35.6, 36.6, 37.6, 38.6, 39.9, 41.1, 42.4, 43.7, 45, 46.2, 47.4, 48.6, 49.8, 50.7, 51.2];
+        const WW = [0.1, 0.1, 0.2, 0.5, 1, 2, 4, 7, 14, 23, 43, 70, 100, 140, 190, 240, 300, 360, 430, 501, 600, 660, 760, 875, 1005, 1153, 1319, 1502, 1702, 1918, 2146, 2383, 2622, 2859, 3083, 3288, 3462];
+        const WD = ['ينغرس الجنين في الرحم ويتكوّن الكيس الأمنيوسي', 'يبدأ تكوّن الأنبوب العصبي أساس الدماغ والنخاع ويبدأ القلب بالتشكل', 'ينبض القلب وتظهر براعم الذراعين والساقين', 'ينمو الدماغ بسرعة وتتشكل ملامح الوجه الأولى', 'تتشكل الأصابع وتتحرك الأطراف حركات خفيفة لا تُحس', 'تتكوّن الأعضاء الأساسية وتتشكل الأذنان والجفنان', 'تتشكل المفاصل والأظافر الأولى وتنمو الأعضاء الحيوية', 'يبدأ الجنين بالتحرك وتتكوّن براعم الأسنان داخل اللثة', 'تعمل الكلى وتبدأ بتكوين البول وتظهر ردود فعل عصبية أولى', 'تظهر بصمات الأصابع وتتكوّن الأحبال الصوتية', 'يتحرك الوجه بتعابير وينمو الشعر الزغبي الناعم', 'تنمو العظام وقد يستشعر الضوء من خلف الجفون المغلقة', 'ينمو الجهاز العصبي وتتحرك العضلات', 'يتكوّن الدهن تحت الجلد وتقوى الهياكل العظمية', 'يبدأ السمع وقد يسمع صوت قلبك وأصواتاً من الخارج', 'يتكوّن الطلاء الدهني الذي يحمي الجلد', 'منتصف الحمل: فحص الموجات المفصل لتقييم البنية وينمو حس اللمس', 'يبتلع السائل الأمنيوسي ويتطور الجهاز الهضمي', 'تنمو الحواجب والرموش وتتطور الحواس', 'تتحسن حركات الجنين ويتفاعل مع الأصوات العالية', 'تتطور الرئتان ويستمر نمو الدماغ بسرعة', 'ينمو شعر الرأس وينتظم نمط النوم والاستيقاظ', 'تبدأ العيون بالانفتاح ويتدرب على حركات التنفس', 'نمو سريع للدماغ وتشكل نمط نوم منتظم', 'بداية الثلث الثالث: يستطيع الرمش وتكتمل تفاصيل كثيرة', 'تقوى العظام والعضلات ويتراكم الكالسيوم', 'يتراكم الدهن وتتعمق تلافيف الدماغ', 'تتطور الحواس ويستجيب للضوء والصوت', 'يتدرب على التنفس والمص وتكتمل الأظافر', 'تتطور المناعة وتنمو العظام والجمجمة ما تزال مرنة', 'تنضج الرئتان تدريجياً ويتخذ معظم الأجنة وضعية الرأس للأسفل', 'تكاد الكلى تكتمل ويتراكم الدهن', 'يتجه الجنين نحو الحوض عند كثير من النساء', 'يصبح الحمل مبكر الاكتمال ويتدرب الجنين على الرضاعة', 'تكتمل الأعضاء ويستمر تراكم الدهون', 'حمل كامل المدة: ما زال الدماغ والرئتان ينضجان', 'موعد الولادة المتوقع، وكثير من الأطفال يولدون بين 37 و42 أسبوعاً'];
+        const PH = [[4, 9, 'ينشأ الأنبوب العصبي ويتكوّن الدماغ الأولي', 'لا حواس بعد', 'حركات دقيقة لا تُحس'], [10, 13, 'تتكوّن مناطق الدماغ وتتصل الخلايا العصبية', 'تتشكل الأذن الداخلية والعينان', 'حركات انعكاسية صغيرة لا تُحس'], [14, 20, 'تنمو التلافيف الأولى ويتكوّن غلاف الأعصاب (الميالين)', 'يبدأ السمع نحو الأسبوع 18 ويتفاعل مع الضوء الساطع', 'قد تبدأ الأم بالإحساس بحركات خفيفة (رفرفة) بين الأسبوعين 16 و25'], [21, 27, 'نمو سريع للدماغ وتتشكل شبكات الاتصال', 'يتحسن السمع ويستجيب للّمس ويتذوق السائل الأمنيوسي', 'حركات أقوى وركلات ونمط نوم واستيقاظ'], [28, 34, 'تنضج التلافيف الدماغية ويتحسن تنظيم التنفس والحرارة', 'يستجيب للأصوات والضوء ويرمش', 'ركلات وتقلبات واضحة، ابدئي عدّ الحركات'], [35, 40, 'يستمر نضج الدماغ والرئتين حتى الولادة', 'حواس مكتملة تقريباً ويتعرف على صوتك', 'مساحة أقل فتقل الحركات الواسعة لكنها تبقى منتظمة']];
+        const MT = [
+            { body: 'ارتفاع هرمونات الحمل وتعب شديد وحساسية الثدي وتقلب المزاج|يبدأ الرحم بالتوسع دون ظهور بطن واضح غالباً', sym: 'غثيان وقيء صباحي|تعب ونعاس|تبول متكرر|حساسية الروائح|تغير الشهية', nut: 'حمض الفوليك حسب توجيه الطبيبة|وجبات صغيرة متكررة للغثيان|شرب الماء بانتظام|تجنب اللحوم النيئة والحليب غير المبستر', act: 'مشي خفيف وتمارين تنفس|راحة كافية', warn: 'نزيف مهبلي|ألم حاد في البطن|قيء شديد لا يتوقف أو عدم القدرة على الشرب|حمى' },
+            { body: 'يظهر البطن وتزداد الطاقة غالباً|تغيرات في الجلد (خط داكن على البطن وكلف)|بدء الإحساس بحركة الجنين', sym: 'ألم الظهر|تقلصات الساق|حرقة المعدة|انسداد الأنف ونزيف اللثة|تمدد الجلد وحكة', nut: 'نحو 340 سعرة إضافية يومياً|كالسيوم وحديد وأوميغا 3|ألياف وماء لتجنب الإمساك', act: 'مشي وسباحة ويوغا الحمل وتمارين قاع الحوض|تجنبي الاستلقاء على الظهر طويلاً', warn: 'نزول سوائل أو نزيف|صداع شديد أو زغللة أو تورم مفاجئ في الوجه واليدين|انخفاض واضح في حركة الجنين|انقباضات منتظمة قبل الأسبوع 37' },
+            { body: 'يضغط الجنين على المعدة والمثانة|انقباضات براكستون هيكس غير المنتظمة تدرب الرحم|ثقل في الحركة وصعوبة النوم', sym: 'ضيق النفس|تورم القدمين|ألم الحوض والظهر|كثرة التبول|اضطراب النوم|حرقة المعدة|إمساك وبواسير', nut: 'نحو 450 سعرة إضافية يومياً|وجبات صغيرة متكررة|بروتين وحديد وكالسيوم', act: 'مشي خفيف وتمارين التنفس والاسترخاء|كرة الولادة وتمارين الحوض', warn: 'نزيف أو نزول ماء|انقباضات منتظمة (5-1-1)|نقص حركة الجنين|صداع شديد أو زغللة أو ألم أعلى البطن|ألم شديد مستمر' }];
+        const testsFor = w => w <= 10 ? 'الزيارة الأولى: تأكيد الحمل بالموجات وفصيلة الدم وتحليل الدم والسكر والضغط' : w <= 13 ? 'الأسابيع 11 إلى 14: فحص الموجات الأول وفحوصات الدم الأولية حسب الطبيبة' : w <= 17 ? 'متابعة دورية للضغط والوزن، وناقشي الفحوصات الجينية عند الحاجة' : w <= 22 ? 'الأسابيع 18 إلى 22: فحص الموجات المفصل لتقييم بنية الجنين' : w <= 27 ? 'الأسابيع 24 إلى 28: تحميل السكر لكشف سكري الحمل وفحص فقر الدم' : w <= 31 ? 'نحو الأسبوع 28: فحص الأجسام المضادة للريزيسي (وحقنة الحماية إن كنتِ سلبية) وابدئي عدّ الحركات' : w <= 35 ? 'موجات لتقييم النمو ووضعية الجنين حسب الطبيبة ومتابعة الضغط' : 'الأسابيع 35 إلى 37: مسحة المكورات العقدية (GBS) وزيارات أسبوعية وخطة الولادة';
+        const ul = l => l.split('|').map(a => `<div class="row"><span>• ${a}</span></div>`).join('');
+        function weekPage(w) {
+            w = Math.max(4, Math.min(40, +w || 4)); const i = w - 4, ph = PH.find(p => w >= p[0] && w <= p[1]), tri = w < 14 ? 0 : w < 28 ? 1 : 2, m = MT[tri], cw = curW(), c = (x, t, b, red) => `<div class="card"${red ? ' style="border:2px solid #E53935"' : ''}><div class="card-title"${red ? ' style="color:#E53935"' : ''}><i class="fas ${x}"></i> ${t}</div>${b}</div>`;
+            pg('الأسبوع ' + w, "goTo('pregnancy')", `<div class="card"><div style="display:flex;gap:8px;align-items:center"><button class="btn-sec" style="margin:0" onclick="weekPage(${w - 1})">${w > 4 ? '<i class="fas fa-chevron-right"></i>' : ''}</button><select class="form-input" style="margin:0" onchange="weekPage(this.value)">${Array.from({ length: 37 }, (_, k) => `<option value="${k + 4}" ${k + 4 === w ? 'selected' : ''}>الأسبوع ${k + 4}${k + 4 === cw && S.done ? ' (الحالي)' : ''}</option>`).join('')}</select><button class="btn-sec" style="margin:0" onclick="weekPage(${w + 1})">${w < 40 ? '<i class="fas fa-chevron-left"></i>' : ''}</button></div></div>` +
+                c('fa-ruler', 'حجم الجنين ووزنه التقريبي', `<div class="card-text">بحجم ${FR[i]}<br>${w < 20 ? 'الطول (من الرأس إلى المقعد)' : 'الطول'}: ${WL[i]} سم<br>الوزن: ${WW[i] < 1 ? 'أقل من غرام' : WW[i] + ' غرام'}<br><small>القيم تقريبية وتختلف بين الأجنة</small></div>`) +
+                c('fa-seedling', 'تطور الجنين هذا الأسبوع', `<div class="card-text">${WD[i]}</div>`) +
+                c('fa-brain', 'الدماغ والجهاز العصبي', `<div class="card-text">${ph[2]}</div>`) + c('fa-ear-listen', 'تطور الحواس', `<div class="card-text">${ph[3]}</div>`) + c('fa-hand', 'حركة الجنين', `<div class="card-text">${ph[4]}</div>`) +
+                c('fa-person-pregnant', 'التغيرات في جسم الأم', ul(m.body)) + c('fa-notes-medical', 'الأعراض الشائعة', ul(m.sym)) + c('fa-apple-whole', 'النصائح الغذائية والصحية', ul(m.nut)) + c('fa-person-walking', 'النشاط البدني المناسب', ul(m.act)) +
+                c('fa-stethoscope', 'الفحوصات والمتابعات لمناقشتها مع الطبيبة', `<div class="card-text">${testsFor(w)}</div>`) +
+                (S.twins === '2' ? c('fa-people-arrows', 'حمل متعدد', '<div class="card-text">تحتاجين متابعة أكثر تقارباً، وقد تكون الأحجام والمواعيد مختلفة. اتبعي جدول طبيبتك.</div>') : '') +
+                c('fa-triangle-exclamation', 'راجعي الطبيب فوراً عند', ul(m.warn), 1) +
+                `<div class="card"><button class="btn-primary" onclick="openTool('kick')">عداد الحركة</button><button class="btn-sec" onclick="openTool('sym')">تسجيل الأعراض</button><button class="btn-sec" onclick="doc('gyn')">حجز موعد مع الطبيبة</button></div>`);
+        }
+
+        // --- high-risk pregnancy tracking ---
+        const CD = [['dm', 'سكري الحمل', 'hr_dm'], ['htn', 'ارتفاع ضغط الدم / تسمم الحمل', 'hr_htn'], ['anem', 'فقر الدم', 'hr_anem'], ['twin', 'الحمل المتعدد', 'hr_twin'], ['thy', 'اضطرابات الغدة الدرقية', 'hr_thy'], ['chr', 'أمراض مزمنة مصاحبة', 'hr_chr'], ['oth', 'حالات أخرى تصنفها الطبيبة', null]];
+        const THD = { sys: 140, dia: 90, fg: 95, p1: 140, p2: 120 };
+        const vflag = (e, t) => { const f = []; if (e.s && (+e.s >= t.sys || +e.dd >= t.dia)) f.push('الضغط'); if (e.g) { const lim = { f: t.fg, p1: t.p1, p2: t.p2 }[e.c]; if (+e.g >= lim) f.push('السكر'); } return f; };
+        function hrTog(k) { S.hr = S.hr || []; S.hr = S.hr.includes(k) ? S.hr.filter(x => x !== k) : [...S.hr, k]; ST('s', S); hr(); }
+        function hr() {
+            const sel = S.hr || [], th = Object.assign({}, THD, ST('thr') || {}), rd = (ST('vit') || []).slice(-10).reverse();
+            pg('الحمل عالي الخطورة', "sec('preg')", `<div class="card"><div class="card-text">اختاري حالتك الصحية كما صنفتها طبيبتك:</div><div class="chips">${CD.map(([k, l]) => `<span class="chip ${sel.includes(k) ? 'on' : ''}" onclick="hrTog('${k}')">${l}</span>`).join('')}</div>${sel.filter(k => CD.find(c => c[0] === k)[2]).map(k => { const c = CD.find(x => x[0] === k); return `<button class="btn-sec" onclick="topic('${c[2]}','hr()')">${c[1]}: معلومات ومتابعة</button>`; }).join('')}</div>
+            <div class="card"><div class="card-title"><i class="fas fa-heart-pulse"></i> تسجيل قياس</div><div style="display:flex;gap:8px"><input id="vs" type="number" class="form-input" placeholder="الضغط الانقباضي"><input id="vd" type="number" class="form-input" placeholder="الانبساطي"></div><input id="vg" type="number" class="form-input" placeholder="السكر (ملغ/دل)"><div class="chips" id="vc">${[['f', 'صائم'], ['p1', 'بعد ساعة'], ['p2', 'بعد ساعتين']].map(([k, l], j) => `<span class="chip ${j ? '' : 'on'}" data-c="${k}" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${l}</span>`).join('')}</div><input id="vw" type="number" step="0.1" class="form-input" placeholder="الوزن (كغ)"><button class="btn-primary" onclick="vitAdd()">حفظ القياس</button></div>
+            <div class="card"><div class="card-title">السجل</div>${rd.map(e => { const f = vflag(e, th); return `<div class="row" ${f.length ? 'style="color:#E53935;font-weight:700"' : ''}><span>${e.t}</span><span>${e.s ? e.s + '/' + e.dd + ' ' : ''}${e.g ? 'سكر ' + e.g + ' (' + { f: 'صائم', p1: 'بعد ساعة', p2: 'بعد ساعتين' }[e.c] + ') ' : ''}${e.w ? e.w + ' كغ' : ''}</span>${f.length ? '<i class="fas fa-triangle-exclamation"></i>' : ''}</div>`; }).join('') || '<div class="card-text">لا قياسات بعد</div>'}</div>
+            <div class="card"><div class="card-title">الحدود التي تحددها طبيبتك</div><div class="card-text" style="font-size:.75rem">قيم افتراضية شائعة، عدّليها حسب توجيه الطبيبة. التنبيه عند بلوغ القيمة أو تجاوزها.</div><div style="display:flex;gap:8px"><input id="t1" type="number" class="form-input" value="${th.sys}" placeholder="انقباضي"><input id="t2" type="number" class="form-input" value="${th.dia}" placeholder="انبساطي"></div><div style="display:flex;gap:8px"><input id="t3" type="number" class="form-input" value="${th.fg}" placeholder="سكر صائم"><input id="t4" type="number" class="form-input" value="${th.p1}" placeholder="بعد ساعة"><input id="t5" type="number" class="form-input" value="${th.p2}" placeholder="بعد ساعتين"></div><button class="btn-sec" onclick="thrSave()">حفظ الحدود</button></div>
+            <div class="card"><button class="btn-sec" onclick="labs()">التحاليل والتقارير الطبية</button><button class="btn-sec" onclick="doc('gyn')">التواصل مع الطبيبة المختصة</button><button class="btn-sec" onclick="notif()">تذكيرات المتابعة</button></div>
+            <div class="card-text" style="font-size:.7rem">التطبيق لا يشخّص ولا يصف علاجاً. للأعراض الشديدة توجهي للطوارئ.</div>`);
+        }
+        function thrSave() { ST('thr', { sys: +$('t1').value || 140, dia: +$('t2').value || 90, fg: +$('t3').value || 95, p1: +$('t4').value || 140, p2: +$('t5').value || 120 }); showModal('تم', 'تم حفظ الحدود'); hr(); }
+        function vitAdd() {
+            const e = { t: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), s: $('vs').value, dd: $('vd').value, g: $('vg').value, w: $('vw').value, c: document.querySelector('#vc .on').dataset.c };
+            if (!e.s && !e.g && !e.w) return showModal('تنبيه', 'أدخلي قياساً واحداً على الأقل');
+            if (e.s && !e.dd || !e.s && e.dd) return showModal('تنبيه', 'أدخلي الضغط الانقباضي والانبساطي معاً');
+            const a = ST('vit') || []; a.push(e); ST('vit', a); const f = vflag(e, Object.assign({}, THD, ST('thr') || {}));
+            hr();
+            if (+e.s >= 160 || +e.dd >= 110) showModal('تنبيه عاجل', 'الضغط مرتفع جداً. توجهي إلى الطوارئ أو اتصلي بطبيبتك فوراً، خاصة مع صداع أو زغللة أو ألم أعلى البطن.');
+            else if (f.length) showModal('تنبيه', 'قراءة ' + f.join(' و') + ' بلغت أو تجاوزت الحدود المسجلة. تواصلي مع طبيبتك. إن ظهرت أعراض شديدة فتوجهي للطوارئ.');
+        }
+
+        // --- labs & reports ---
+        function labs() {
+            const a = ST('labs') || [], rp = ST('reports') || [];
+            pg('التحاليل والتقارير الطبية', "goTo('records')", `<div class="card"><div class="card-title">إضافة نتيجة تحليل</div><input id="ld" type="date" class="form-input"><input id="ln" class="form-input" placeholder="اسم التحليل (مثل: الهيموغلوبين)"><input id="lr" class="form-input" placeholder="النتيجة (مثل: 10.5 غ/دل)"><button class="btn-primary" onclick="labAdd()">حفظ</button></div>
+            <div class="card"><div class="card-title">النتائج المسجلة</div>${a.map((x, i) => `<div class="row"><span>${x.d}</span><span>${esc(x.n)}: ${esc(x.r)}</span><span onclick="labDel(${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span></div>`).reverse().join('') || '<div class="card-text">لا نتائج بعد</div>'}</div>
+            <div class="card"><div class="card-title">تقارير وصور طبية</div>${rp.map(x => `<div class="row"><span><i class="fas fa-paperclip"></i> ${esc(x.n)}</span><span>${x.d}</span></div>`).join('') || '<div class="card-text">لا ملفات مرفوعة</div>'}<label class="btn-sec" style="display:block;text-align:center"><i class="fas fa-upload"></i> رفع تقرير أو صورة<input type="file" style="display:none" onchange="labFile(this)"></label></div>`);
+        }
+        function labAdd() { const n = $('ln').value.trim(), r = $('lr').value.trim(); if (!n || !r) return showModal('تنبيه', 'أدخلي اسم التحليل والنتيجة'); const a = ST('labs') || []; a.push({ d: $('ld').value || new Date().toLocaleDateString(), n, r }); ST('labs', a); labs(); }
+        function labDel(i) { const a = ST('labs') || []; a.splice(i, 1); ST('labs', a); labs(); }
+        function labFile(el) { const f = el.files[0]; if (!f) return; const r = ST('reports') || []; r.push({ d: new Date().toLocaleDateString(), n: f.name }); ST('reports', r); labs(); }
+
+        // --- birth plan ---
+        const BP = ['وجود مرافق داعم أثناء الولادة', 'إضاءة خافتة وموسيقى هادئة', 'حرية الحركة وتغيير الوضعيات', 'تسكين الألم بالطرق الطبيعية أولاً', 'مناقشة التخدير فوق الجافية عند الحاجة', 'تلامس الجلد للجلد فور الولادة', 'الرضاعة في الساعة الأولى', 'أن يقطع الأب الحبل السري', 'بقاء الطفل معي في الغرفة', 'تفضيلاتي في حال القيصرية (حضور المرافق، تلامس الجلد)'];
+        function birthPlan() {
+            const p = ST('bplan') || { c: [], n: '' };
+            pg('خطة الولادة', "sec('prep')", `<div class="card"><div class="card-text">اختاري تفضيلاتك وناقشيها مع طبيبتك أو القابلة قبل الأسبوع 36. الخطة تعبّر عن رغباتك وقد تتغير حسب الحالة الطبية.</div><div class="chips" id="bpc">${BP.map(x => `<span class="chip ${p.c.includes(x) ? 'on' : ''}" onclick="this.classList.toggle('on')">${x}</span>`).join('')}</div><textarea id="bpn" class="form-input" placeholder="ملاحظات أخرى">${esc(p.n)}</textarea><button class="btn-primary" onclick="bpSave()">حفظ الخطة</button></div><div class="card"><button class="btn-sec" onclick="doc('gyn')">مناقشتها مع الطبيبة</button><button class="btn-sec" onclick="doc('mid')">مناقشتها مع القابلة</button></div>`);
+        }
+        function bpSave() { ST('bplan', { c: [...document.querySelectorAll('#bpc .on')].map(e => e.textContent), n: $('bpn').value }); showModal('تم', 'تم حفظ خطة الولادة'); }
+
+        // --- baby hub ---
+        const MS = [[0, 'يرفع رأسه قليلاً عند الاستلقاء على البطن|يتتبع الوجوه والأضواء القريبة|يتفاعل مع الأصوات العالية|يتعرف على صوت أمه'], [2, 'ابتسامة اجتماعية|يصدر أصواتاً هادئة|يتابع الأشياء بعينيه|يرفع رأسه عند الاستلقاء على البطن'], [4, 'يضحك بصوت عالٍ|يمسك الأشياء بيديه|يدعم نفسه على الذراعين|يقلد الأصوات'], [6, 'يتقلب من البطن للظهر|يبدأ الجلوس بدعم|يناغي|يتعرف على الوجوه المألوفة'], [9, 'يجلس دون دعم|يبدأ الزحف|ينطق مقاطع مثل ما ما|يلتقط الأشياء الصغيرة بأصابعه'], [12, 'يقف متمسكاً|قد يخطو خطواته الأولى|يقول كلمات بسيطة|يلوّح بيده وداعاً'], [18, 'يمشي بثبات|يقول عدة كلمات|يشير لما يريد|يقلد الأعمال المنزلية'], [24, 'يركض|يركب جملة من كلمتين|يتبع تعليمات بسيطة|يلعب بجانب الأطفال']];
+        function babyHub() {
+            const b = ST('baby');
+            if (!b) return pg('طفلي ونموه', "goTo('records')", `<div class="card"><div class="card-title">بيانات الطفل</div><input id="bn" class="form-input" placeholder="اسم الطفل"><div class="lbl">تاريخ الميلاد</div><input id="bd" type="date" class="form-input" max="${isoD(td())}"><div class="chips" id="bsx"><span class="chip on" data-s="m" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">ذكر</span><span class="chip" data-s="f" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">أنثى</span></div><button class="btn-primary" onclick="babySave()">حفظ</button></div>`);
+            const days = Math.max(0, Math.floor((td() - new Date(b.dob + 'T00:00')) / D)), mo = Math.floor(days / 30.44), ms = [...MS].reverse().find(x => x[0] <= mo) || MS[0], g = ST('bg') || [], vx = ST('vax') || [], lim = isoD(new Date(+td() + 14 * D));
+            pg('طفلي ونموه', "goTo('records')", `<div class="card text-center"><div class="card-title" style="justify-content:center">${esc(b.n)}</div><div class="card-text">${mo < 1 ? days + ' يوماً' : mo + ' شهراً'} • ${b.sx === 'f' ? 'أنثى' : 'ذكر'}<br>تاريخ الميلاد: ${b.dob}</div></div>
+            <div class="card"><div class="card-title"><i class="fas fa-child-reaching"></i> مراحل النمو المتوقعة (نحو ${ms[0]} شهر فأكثر)</div>${ul(ms[1])}<div class="card-text" style="font-size:.7rem">معالم تقريبية، فالأطفال يتفاوتون. التطور الحركي واللغوي والمعرفي والاجتماعي يُتابع مع طبيب الأطفال.</div><button class="btn-sec" onclick="topic('par_delay','babyHub()')">مؤشرات التأخر النمائي</button></div>
+            <div class="card"><div class="card-title"><i class="fas fa-weight-scale"></i> الوزن والطول ومحيط الرأس</div><div style="display:flex;gap:8px"><input id="gw" type="number" step="0.01" class="form-input" placeholder="الوزن (كغ)"><input id="gl" type="number" step="0.1" class="form-input" placeholder="الطول (سم)"><input id="gh" type="number" step="0.1" class="form-input" placeholder="الرأس (سم)"></div><button class="btn-primary" onclick="grAdd()">إضافة قياس</button>${g.map((x, i) => `<div class="row"><span>${x.d}</span><span>${x.w ? x.w + ' كغ ' : ''}${x.l ? x.l + ' سم ' : ''}${x.h ? 'رأس ' + x.h : ''}</span><span onclick="grDel(${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span></div>`).reverse().join('')}</div>
+            <div class="card"><div class="card-title"><i class="fas fa-syringe"></i> التلقيحات</div><div class="card-text" style="font-size:.75rem">اتبعي جدول التلقيح الوطني المعتمد وتوجيه طبيب الأطفال، وسجلي هنا ما تلقاه طفلك والموعد القادم لتذكيرك.</div><input id="vn" class="form-input" placeholder="اسم اللقاح"><div class="lbl">تاريخ التلقيح</div><input id="vt" type="date" class="form-input"><div class="lbl">الموعد القادم (اختياري)</div><input id="vx" type="date" class="form-input"><button class="btn-primary" onclick="vxAdd()">حفظ</button>${vx.map((x, i) => `<div class="row" ${x.nx && x.nx >= isoD(td()) && x.nx <= lim ? 'style="color:#D37586;font-weight:700"' : ''}><span>${esc(x.n)} (${x.t})</span><span>${x.nx ? 'القادم: ' + x.nx : ''}</span><span onclick="vxDel(${i})" style="color:#E53935;cursor:pointer"><i class="fas fa-xmark"></i></span></div>`).join('')}</div>
+            <div class="card"><div class="card-title">رعاية وتربية مبكرة</div>${['nb_care', 'nb_signs', 'bf_basic', 'par_cry', 'par_bond', 'par_play', 'par_sleep'].map(k => `<div class="row" style="cursor:pointer" onclick="topic('${k}','babyHub()')"><span>${TP[k].t}</span><i class="fas fa-chevron-left" style="color:#D37586"></i></div>`).join('')}</div>
+            <div class="card"><button class="btn-sec" onclick="doc('ped')">حجز استشارة طبيب الأطفال</button><button class="btn-sec" onclick="ST('baby',null);babyHub()">تعديل بيانات الطفل</button></div>`);
+        }
+        function babySave() { const n = $('bn').value.trim(), dob = $('bd').value; if (!n || !dob) return showModal('تنبيه', 'أدخلي الاسم وتاريخ الميلاد'); ST('baby', { n, dob, sx: document.querySelector('#bsx .on').dataset.s }); babyHub(); }
+        function grAdd() { const e = { d: new Date().toLocaleDateString(), w: $('gw').value, l: $('gl').value, h: $('gh').value }; if (!e.w && !e.l && !e.h) return; const a = ST('bg') || []; a.push(e); ST('bg', a); babyHub(); }
+        function grDel(i) { const a = ST('bg') || []; a.splice(i, 1); ST('bg', a); babyHub(); }
+        function vxAdd() { const n = $('vn').value.trim(); if (!n) return showModal('تنبيه', 'أدخلي اسم اللقاح'); const a = ST('vax') || []; a.push({ n, t: $('vt').value || new Date().toLocaleDateString(), nx: $('vx').value }); ST('vax', a); babyHub(); }
+        function vxDel(i) { const a = ST('vax') || []; a.splice(i, 1); ST('vax', a); babyHub(); }
+
+        // --- wiring: section items become detailed pages ---
+        SEC.preg = { t: 'متابعة الحمل', i: 'fa-baby', items: ['متابعة الحمل حسب مراحله', 'حجز مواعيد طبيبة النساء والتوليد والقابلة', 'متابعة الحالات التي تحتاج إلى عناية خاصة، مثل سكري الحمل وارتفاع ضغط الدم وفقر الدم', 'معلومات وإرشادات حول نمو الجنين وصحة الأم', 'تذكير بمواعيد الفحوصات والمتابعة'], w: 'نزيف، ألم شديد، صداع شديد مع زغللة أو تورم مفاجئ، أو نقص حركة الجنين: راجعي الطبيبة أو الطوارئ فوراً.', sp: ['gyn', 'mid'], l: [['تفاصيل الأسبوع الحالي', 'weekPage(curW())'], ['متابعة حملي ومخطط الأسابيع', "goTo('pregnancy')"], ['تتبع الأعراض', "openTool('sym')"], ['عداد الحركة', "openTool('kick')"], ['الحمل عالي الخطورة', 'hr()'], ['تغذية الحامل', "topic('nut_stage')"], ['تمارين الحمل', "topic('ex_preg')"], ['التحاليل والتقارير', 'labs()']] };
+        SEC.plan.l.push(['الإباضة والخصوبة', "topic('fertility')"]);
+        SEC.prep.l.push(['مراحل الولادة الطبيعية', "topic('lab_stages')"], ['القيصرية والفرق بينها وبين الطبيعية', "topic('cs')"], ['علامات المخاض ومتى تتوجهين للمستشفى', "topic('lab_signs')"], ['التعامل مع آلام المخاض', "topic('lab_pain')"], ['التهيئة النفسية وتقليل الخوف', "topic('lab_fear')"], ['الإجراءات الطبية أثناء الولادة', "topic('lab_proc')"], ['خطة الولادة', 'birthPlan()'], ['الرضاعة المبكرة', "topic('lab_bf')"], ['دعم الزوج والأسرة', "lib('fam')"]);
+        SEC.baby.l.push(['شفط الحليب وتخزينه', "topic('bf_pump')"], ['طفلي: النمو والتلقيحات', 'babyHub()'], ['بكاء الرضيع', "topic('par_cry')"], ['علاقة آمنة بين الأم والطفل', "topic('par_bond')"], ['أنشطة وتنمية الحواس', "topic('par_play')"], ['نوم الرضيع', "topic('par_sleep')"], ['مؤشرات التأخر النمائي', "topic('par_delay')"]);
+        const ITEM = { 'استشارات ما قبل الحمل': "topic('pre_consult')", 'التوجيه الصحي والنفسي للاستعداد للحمل': "topic('pre_health')", 'الإرشاد التغذوي والاستعداد الجسدي': "topic('pre_nut')", 'حجز موعد مع المختصين': 'docs()', 'دورات التحضير النفسي والجسدي للولادة': "lib('crs')", 'تمارين التنفس والاسترخاء': "openTool('breath')", 'تمارين مناسبة للحامل تحت إشراف مختص': "topic('ex_preg')", 'التوعية بمراحل الولادة': "topic('lab_stages')", 'فيديوهات تعليمية للتحضير للولادة': "lib('vid')", 'حجز جلسات مع أخصائية نفسية': "doc('psy')", 'استشارات نفسية عن بُعد': "doc('psy')", 'متابعة القلق والتوتر والاكتئاب المرتبط بالحمل والأمومة': "topic('anx')", 'برامج الاسترخاء وإدارة الضغط': "topic('relax')", 'التوعية باكتئاب ما بعد الولادة وذهان النفاس': "topic('ppd')", 'التوجيه إلى الجهات الصحية المختصة عند الأعراض الخطيرة': "topic('refer')", 'حجز استشارات مع أخصائي التغذية': "doc('nut')", 'إرشادات غذائية لكل مرحلة من الحمل': "topic('nut_stage')", 'التغذية في سكري الحمل وفقر الدم': "topic('nut_dm')", 'التغذية المناسبة خلال الرضاعة الطبيعية': "topic('nut_bf')", 'الإرشادات الغذائية بعد الولادة': "topic('nut_pp')", 'متابعة التعافي الجسدي بعد الولادة': "topic('rec_body')", 'استعادة اللياقة البدنية تدريجياً وبأمان': "topic('rec_ex')", 'تمارين مناسبة تحت إشراف مختص': "doc('fit')", 'إرشادات الراحة والنوم': "topic('rec_sleep')", 'المتابعة النفسية للأم بعد الولادة': "goTo('mood')", 'إرشادات الرضاعة الطبيعية': "topic('bf_basic')", 'المساعدة في صعوبات الرضاعة': "topic('bf_prob')", 'استشارة مختصة بالرضاعة': "doc('mid')", 'العناية اليومية بالمولود واحتياجاته الأساسية': "topic('nb_care')", 'العلامات التي تستدعي استشارة طبيب الأطفال': "topic('nb_signs')", 'متابعة الحمل حسب مراحله': "goTo('pregnancy')", 'حجز مواعيد طبيبة النساء والتوليد والقابلة': 'docs()', 'متابعة الحالات التي تحتاج إلى عناية خاصة، مثل سكري الحمل وارتفاع ضغط الدم وفقر الدم': 'hr()', 'معلومات وإرشادات حول نمو الجنين وصحة الأم': 'weekPage(curW())', 'تذكير بمواعيد الفحوصات والمتابعة': 'notif()' };
+        const itemRow = x => ITEM[x] ? `<div class="row" style="cursor:pointer" onclick="${ITEM[x]}"><span>• ${x}</span><i class="fas fa-chevron-left" style="color:#D37586"></i></div>` : `<div class="row"><span>• ${x}</span></div>`;
+
+        // --- symptom tracker: full list from the spec ---
+        const _lib = lib; lib = function (t) { _lib(t); $('pgBody').insertAdjacentHTML('afterbegin', '<button class="btn-sec" onclick="topics()"><i class="fas fa-book-medical"></i> كل المواضيع الطبية</button>'); };
+        const _rr = renderRec; renderRec = function () { _rr(); $('recBody').insertAdjacentHTML('afterbegin', '<div class="card"><div class="card-title">الرعاية والمتابعة</div>' + [['fa-baby', 'طفلي ونموه والتلقيحات', 'babyHub()'], ['fa-vials', 'التحاليل والتقارير الطبية', 'labs()'], ['fa-heart-pulse', 'الحمل عالي الخطورة وقياساتي', 'hr()'], ['fa-clipboard-list', 'خطة الولادة', 'birthPlan()'], ['fa-book-medical', 'كل المواضيع الطبية', 'topics()']].map(([i, t, j]) => `<div class="row" style="cursor:pointer" onclick="${j}"><span><i class="fas ${i}"></i> ${t}</span><i class="fas fa-chevron-left"></i></div>`).join('') + '</div>'); };
+        H.records = renderRec;
+        (function boot() { const a = ST('acc'), se = ST('sess'); if (a && se && se.e === a.email) { applyLang(); goTo(S.done ? 'home' : 'onb'); } })();
+
+        // ===== v8: official sources, "learn more" links, daily tips =====
+        const ML = 'https://medlineplus.gov/languages/', WHOMM = 'https://www.who.int/teams/mental-health-and-substance-use/promotion-prevention/maternal-mental-health', CDCM = 'https://www.cdc.gov/breastfeeding/breast-milk-preparation-and-storage/handling-breastmilk.html';
+        const TU = {
+            pre_consult: 'prenatalcare', pre_health: 'pregnancy', pre_nut: 'pregnancyandnutrition', fertility: 'menstruation', ex_preg: 'pregnancy',
+            hr_dm: 'diabetesandpregnancy', hr_htn: 'highbloodpressureinpregnancy', hr_anem: 'anemia', hr_twin: 'twinstripletsmultiplebirths', hr_thy: 'thyroiddiseases', hr_chr: 'healthproblemsinpregnancy',
+            lab_stages: 'childbirth', cs: 'cesareandelivery', lab_signs: 'childbirth', lab_pain: 'childbirth', lab_fear: 'childbirth', lab_proc: 'childbirth', lab_bf: 'breastfeeding',
+            anx: 'anxiety', relax: 'anxiety', ppd: 'postpartumdepression', refer: 'postpartumdepression',
+            nut_stage: 'pregnancyandnutrition', nut_dm: 'diabetesandpregnancy', nut_bf: 'breastfeeding', nut_pp: 'postpartumcare',
+            rec_body: 'postpartumcare', rec_ex: 'postpartumcare', rec_sleep: 'postpartumcare',
+            bf_basic: 'breastfeeding', bf_prob: 'breastfeeding', bf_pump: 'breastfeeding', nb_care: 'infantandnewborncare', nb_signs: 'commoninfantandnewbornproblems',
+            par_cry: 'infantandnewborncare', par_bond: 'parenting', par_play: 'infantandnewborndevelopment', par_sleep: 'suddeninfantdeathsyndrome', par_delay: 'infantandnewborndevelopment'
+        };
+        const MHT = ['anx', 'relax', 'ppd', 'refer'];
+        function openExt(u) { window.open(u, '_blank', 'noopener'); }
+        function moreCard(k) {
+            if (!TU[k]) return '';
+            return `<div class="card"><div class="card-title"><i class="fas fa-book-medical"></i> المصدر والمزيد</div><div class="card-text">صفحات رسمية موثوقة (فيها مقالات شاملة بالعربية) من المكتبة الوطنية الأمريكية للطب.</div><button class="btn-primary" onclick="openExt('${ML}${TU[k]}.html')"><i class="fas fa-arrow-up-right-from-square"></i> تعرّفي على المزيد</button>${MHT.includes(k) ? `<button class="btn-sec" onclick="openExt('${WHOMM}')"><i class="fas fa-globe"></i> منظمة الصحة العالمية: الصحة النفسية للأم</button>` : ''}${k === 'bf_pump' ? `<button class="btn-sec" onclick="openExt('${CDCM}')"><i class="fas fa-globe"></i> CDC: تخزين حليب الأم</button>` : ''}</div>`;
+        }
+        const TIPSX = [
+            ['fa-seedling', 'حمض الفوليك', 'يُنصح بـ 400 ميكروغرام يومياً قبل الحمل بشهر على الأقل وحتى الأسبوع 12، ثم نحو 600 ميكروغرام لاحقاً. الجرعة تحددها طبيبتك.', ML + 'pregnancyandnutrition.html', 'MedlinePlus'],
+            ['fa-mug-hot', 'الكافيين', 'يوصي الكلية الأمريكية لأطباء النساء والتوليد (ACOG) بألا يتجاوز 200 ملغ يومياً، أي نحو كوب قهوة كبير.', ML + 'pregnancyandnutrition.html', 'MedlinePlus'],
+            ['fa-stethoscope', 'المتابعة قبل الولادة', 'الزيارات المنتظمة تكشف مشاكل الضغط والسكري وفقر الدم مبكراً. التزمي بمواعيد طبيبتك.', ML + 'prenatalcare.html', 'MedlinePlus'],
+            ['fa-sun', 'فيتامين د', 'يتوفر من التعرض المعتدل للشمس ومن الأسماك والبيض والأطعمة المدعّمة. اسألي طبيبتك قبل تناول أي مكمل.', ML + 'vitamind.html', 'MedlinePlus'],
+            ['fa-droplet', 'شرب الماء', 'الإكثار من الماء (نحو 8 إلى 10 أكواب) يساعد على تخفيف الإمساك والتعب أثناء الحمل.', ML + 'pregnancyandnutrition.html', 'MedlinePlus'],
+            ['fa-person-walking', 'النشاط البدني', 'النشاط المعتدل نحو 150 دقيقة أسبوعياً (مثل المشي) مناسب لمعظم الحوامل بعد موافقة الطبيبة.', ML + 'pregnancy.html', 'MedlinePlus'],
+            ['fa-triangle-exclamation', 'علامات تستدعي المراجعة', 'ارتفاع الضغط مع صداع شديد أو زغللة أو تورم مفاجئ، أو نزيف، أو نقص حركة الجنين: توجهي للطبيبة أو الطوارئ فوراً.', ML + 'highbloodpressureinpregnancy.html', 'MedlinePlus'],
+            ['fa-heart', 'صحتك النفسية', 'حوالي 10% من الحوامل و13% من النساء بعد الولادة يعانين اضطراباً نفسياً، أغلبه اكتئاب (منظمة الصحة العالمية). طلب المساعدة قوة وليس ضعفاً.', WHOMM, 'منظمة الصحة العالمية'],
+            ['fa-hand-holding-heart', 'الشهور الثلاثة بعد الولادة', 'يوصى بالتواصل مع الطبيبة خلال أول 3 أسابيع، وفحص شامل في موعد أقصاه 12 أسبوعاً بعد الولادة (ACOG).', ML + 'postpartumcare.html', 'MedlinePlus'],
+            ['fa-jar', 'تخزين حليب الأم', 'حرارة الغرفة حتى 4 ساعات، الثلاجة حتى 4 أيام، المجمد الأفضل خلال 6 أشهر ويمكن حتى 12 شهراً (CDC).', CDCM, 'CDC'],
+            ['fa-bed', 'نوم الرضيع الآمن', 'ضعي طفلك على ظهره على سطح ثابت، وفي غرفتك وسرير منفصل دون وسائد أو ألعاب في السرير.', ML + 'suddeninfantdeathsyndrome.html', 'MedlinePlus']
+        ];
+        function renderTips() {
+            $('tipsBody').innerHTML = TIPSX.map(([i, t, b, u, src]) => `<div class="card" style="border-right:4px solid #D37586"><div class="card-title"><i class="fas ${i}"></i> ${t}</div><div class="card-text">${b}</div><button class="btn-sec" onclick="openExt('${u}')"><i class="fas fa-arrow-up-right-from-square"></i> تعرّفي على المزيد</button><div class="card-text" style="font-size:.65rem;color:#999">المصدر: ${src}</div></div>`).join('') + '<div class="card-text" style="font-size:.7rem">المحتوى للتثقيف العام ولا يغني عن استشارة الطبيبة أو المختص.</div>';
+        }
+        H.tips = renderTips;
+    </script>
+
+</body>
+</html>
